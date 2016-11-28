@@ -1,11 +1,12 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
+use App\Elegant;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * App\ArtistGenre
+ * App\Models\ArtistGenre
  *
  * @property integer $id
  * @property \Carbon\Carbon $created_at
@@ -13,12 +14,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Carbon\Carbon $deleted_at
  * @property integer $artist_id
  * @property integer $genre_id
- * @method static \Illuminate\Database\Query\Builder|\App\ArtistGenre whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\ArtistGenre whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\ArtistGenre whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\ArtistGenre whereDeletedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\ArtistGenre whereArtistId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\ArtistGenre whereGenreId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistGenre whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistGenre whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistGenre whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistGenre whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistGenre whereArtistId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistGenre whereGenreId($value)
  * @mixin \Eloquent
  */
 class ArtistGenre extends Elegant {

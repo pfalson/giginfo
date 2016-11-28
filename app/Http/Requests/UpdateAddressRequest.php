@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Address;
+use App\Models\Address;
 
 class UpdateAddressRequest extends FormRequest
 {

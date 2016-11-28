@@ -2,10 +2,10 @@ Vue.http.headers.common['X-CSRF-TOKEN'] = $("#token").attr("value");
 
 new Vue({
 
-  el: '#manage-artist',
+  el: '#manage-artists',
 
   data: {
-    artists: [],
+    artistss: [],
     pagination: {
         total: 0,
         per_page: 2,
@@ -51,49 +51,49 @@ new Vue({
 
   methods : {
         getVueArtists: function(page){
-          this.$http.get('/crudartist?page='+page).then((response) => {
-            this.$set('artists', response.data.data.data);
+          this.$http.get('/crudartists?page='+page).then((response) => {
+            this.$set('artistss', response.data.data.data);
             this.$set('pagination', response.data.pagination);
           });
         },
 
         createArtist: function(){
 		  var input = this.fillArtist;
-		  this.$http.post('/crudartist',input).then((response) => {
+		  this.$http.post('/crudartists',input).then((response) => {
 		    this.changePage(this.pagination.current_page);
 			this.newArtist = {'id':'','created_at':'','updated_at':'','name':'','website':'','facebook':'',};
-			$("#create-artist").modal('hide');
+			$("#create-artists").modal('hide');
 			toastr.success('Artist Created Successfully.', 'Success Alert', {timeOut: 5000});
 		  }, (response) => {
 			this.formErrors = response.data;
 	    });
 	},
 
-      deleteArtist: function(artist){
-        this.$http.delete('/crudartist/'+artist.id).then((response) => {
+      deleteArtist: function(artists){
+        this.$http.delete('/crudartists/'+artists.id).then((response) => {
             this.changePage(this.pagination.current_page);
             toastr.success('Artist Deleted Successfully.', 'Success Alert', {timeOut: 5000});
         });
       },
 
-      editArtist: function(artist){
+      editArtist: function(artists){
         
-				this.fillArtist.id = artist.id;
-				this.fillArtist.created_at = artist.created_at;
-				this.fillArtist.updated_at = artist.updated_at;
-				this.fillArtist.name = artist.name;
-				this.fillArtist.website = artist.website;
-				this.fillArtist.facebook = artist.facebook;
+				this.fillArtist.id = artists.id;
+				this.fillArtist.created_at = artists.created_at;
+				this.fillArtist.updated_at = artists.updated_at;
+				this.fillArtist.name = artists.name;
+				this.fillArtist.website = artists.website;
+				this.fillArtist.facebook = artists.facebook;
 
-          $("#edit-artist").modal('show');
+          $("#edit-artists").modal('show');
       },
 
       updateArtist: function(id){
         var input = this.fillArtist;
-        this.$http.put('/crudartist/'+id,input).then((response) => {
+        this.$http.put('/crudartists/'+id,input).then((response) => {
             this.changePage(this.pagination.current_page);
             this.fillArtist = {'id':'','created_at':'','updated_at':'','name':'','website':'','facebook':'',};
-            $("#edit-artist").modal('hide');
+            $("#edit-artists").modal('hide');
             toastr.success('Artist Updated Successfully.', 'Success Alert', {timeOut: 5000});
           }, (response) => {
               this.formErrorsUpdate = response.data;

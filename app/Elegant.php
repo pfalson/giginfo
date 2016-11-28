@@ -21,6 +21,8 @@ class Elegant extends Eloquent
 	 */
 	private static $lastError;
 
+	public static $rules = [];
+
 	/**
 	 * @return string
 	 */

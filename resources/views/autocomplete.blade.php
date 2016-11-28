@@ -1,35 +1,34 @@
-<!-- jQuery -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js'></script>
+<script src='/js/openLayers.js'></script>
+<script src='https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyDCFUSNaAg1mpT8S_GPO-36AmRLNxN7pG4'></script>
 
-<!-- jQuery UI -->
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script src='/js/location-picker.js'></script>
 
-<!-- Input -->
-<input id="title_1" type="text">
-<input id="title_2" type="text">
-<input id="title_3" type="text">
+<style>
+    #map { height: 400px; width:100%;}
+    .map-container { margin-top: 10px;}
+</style>
+</head>
+<body>
+<div class='location-picker'>
+    <input type='text' id='txtAddress' class='form-control' placeholder='Enter your address here' data-type='address' />
+    <input type='hidden' id='txtLocation' data-type='location-store' />
 
+    <div class='map-container'>
+        <div id='map' data-type='map'></div>
+    </div>
+</div>
 <script>
-
-    $(document).ready(function(){
-
-        // Using Array
-
-        {!! FormAutocomplete::selector('#title_1')->source(['aaaaa', 'bbbbb', 'cccccc']) !!}
-
-        // Using Closure
-
-        {!! FormAutocomplete::selector('#title_2')->source(function(){
-
-            return \App\City::where('name', 'like', '%dn%')->pluck('name');  // You need to return array values.
-
-        }) !!}
-
-        // Using Table and column
-
-        {!! FormAutocomplete::selector('#title_3')->db('cities', 'name') !!}
-
+    $(function(){
+        var locationPicker = $('.location-picker').locationPicker({
+            locationChanged : function(data){
+                $('#output').text(JSON.stringify(data));
+            }
+        });
     });
-
 </script>
+</body>

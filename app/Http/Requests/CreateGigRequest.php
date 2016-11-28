@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Requests\API;
+namespace App\Http\Requests;
 
-use App\State;
+use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Gig;
 
-class UpdateStateAPIRequest extends MyAPIRequest
+class CreateGigRequest extends FormRequest
 {
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -23,6 +25,6 @@ class UpdateStateAPIRequest extends MyAPIRequest
      */
     public function rules()
     {
-        return State::$rules;
+        return Gig::$rules;
     }
 }

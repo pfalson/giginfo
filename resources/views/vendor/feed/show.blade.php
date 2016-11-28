@@ -14,16 +14,24 @@
 @endif
         <updated>{{ $channel['pubdate'] }}</updated>
 @foreach($items as $item)
-        <entry>
-            <author>
-                <name>{{ $item['author'] }}</name>
-            </author>
-            <title type="text"><![CDATA[{!! $item['title'] !!}]]></title>
-            <link rel="alternate" type="text/html" href="{{ $item['link'] }}"></link>
-            <id>{{ $item['link'] }}</id>
-            <summary type="html"><![CDATA[{!! $item['description'] !!}]]></summary>
-            <content type="html"><![CDATA[{!! $item['content'] !!}]]></content>
-            <updated>{{ $item['pubdate'] }}</updated>
-        </entry>
+    <?php
+        $show = $item['content'];
+            $hasPoster = empty($show['poster']) ? '0' : '1';
+        ?>
+        <show>
+            <id>{{ $show['id'] }}</id>
+            <poster>{{ $hasPoster }}</poster>
+            <date>{{ explode(' ', $show['start'])[0] }}</date>
+            <timeSet>{{ explode(' ', $show['start'])[1] }}</timeSet>
+            <venueAddress>{{ $show['street_number'] . ' ' . $show['streetName'] . ' ' . $show['cityName'] }}</venueAddress>
+            <stateAbbreviation>{{ $show['abbr'] }}</stateAbbreviation>
+            <countryAbbreviation>{{ $show['countryCode'] }}</countryAbbreviation>
+            <name>{{ $show['name'] }}</name>
+            <city>{{ $show['cityName'] }}</city>
+            <ageValue>{{ $show['ageValue'] }}</ageValue>
+            <venueName>{{ $show['venueName'] }}</venueName>
+            <venueURI>{{ $show['venueURI'] }}</venueURI>
+            <recordKey>{{ $show['name'] }}</recordKey>
+        </show>
 @endforeach
 </feed>

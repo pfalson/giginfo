@@ -10,7 +10,7 @@ class DatabaseSeeder extends Seeder {
 		Model::unguard();
 
 		$tables = [
-			'PostalTableSeeder'
+			'GigSeeder'
 		];
 
 		foreach ($tables as $table)

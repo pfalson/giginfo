@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Scope;
  * Date: 10/22/2016
  * Time: 10:20 AM
  */
-class AddressScope implements Scope
+class AgeScope implements Scope
 {
 	/**
 	 * Apply the scope to a given Eloquent query builder.
@@ -21,6 +21,6 @@ class AddressScope implements Scope
 	 */
 	public function apply(Builder $builder, Model $model)
 	{
-		$builder->join('streets as s','s.id','street_id')->join('cities as c', 'c.id', 'city_id')->select(['addresses.*','s.name as streetName','c.name as cityName']);
+		$builder->where('name','age')->select(['id', 'code','value']);
 	}
 }

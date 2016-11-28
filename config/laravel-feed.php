@@ -9,7 +9,7 @@ return [
              * the items that should appear in the feed. For example:
              * '\App\Model@getAllFeedItems'
              */
-            'items' => '\App\Gig@getShows',
+            'items' => '\App\Models\Gig@getShows',
 
             /*
              * The feed will be available on this url.

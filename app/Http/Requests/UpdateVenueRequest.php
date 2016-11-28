@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Venue;
+use App\Models\Venue;
 
 class UpdateVenueRequest extends FormRequest
 {

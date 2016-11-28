@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Street;
+use App\Models\Street;
 use InfyOm\Generator\Common\BaseRepository;
 
 class StreetRepository extends BaseRepository

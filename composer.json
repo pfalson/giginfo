@@ -22,16 +22,24 @@
     "laravelcollective/html": "dev-master",
     "infyomlabs/adminlte-templates": "5.3.x-dev",
     "sukohi/form-autocomplete": "2.*",
-    "doctrine/dbal": "~2.3",
     "distilleries/form-builder": "2.*",
-    "nicolaslopezj/searchable": "1.*"
+    "nicolaslopezj/searchable": "1.*",
+    "intervention/image": "^2.3",
+    "backpack/crud": "^3.1",
+    "league/glide": "^1.1",
+    "backpack/base": "^0.7.3",
+    "backpack/langfilemanager": "^1.0",
+    "hisorange/browser-detect": "^2.0",
+    "laravel/socialite": "^2.0"
   },
   "require-dev": {
     "fzaninotto/faker": "~1.4",
     "mockery/mockery": "0.9.*",
     "phpunit/phpunit": "~5.0",
     "symfony/css-selector": "3.1.*",
-    "symfony/dom-crawler": "3.1.*"
+    "symfony/dom-crawler": "3.1.*",
+    "laracasts/generators": "^1.1",
+    "backpack/generators": "^1.1"
   },
   "autoload": {
     "classmap": [

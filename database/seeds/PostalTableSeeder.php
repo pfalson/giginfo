@@ -1,11 +1,11 @@
 <?php
 
-use App\City;
-use App\LocationType;
-use App\PostalCode;
-use App\PostalLocation;
-use App\PostCodeType;
-use App\State;
+use App\Models\City;
+use App\Models\LocationType;
+use App\Models\PostalCode;
+use App\Models\PostalLocation;
+use App\Models\PostCodeType;
+use App\Models\State;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -203,7 +203,7 @@ class PostalTableSeeder extends Seeder
 				'code' => $code,
 				'city_id' => $city_id,
 				'postallocation_id' => $location_id,
-				'longtitude' => $long,
+				'longitude' => $long,
 				'latitude' => $lat,
 				'locationtype_id' => $ltype_id,
 				'postcodetype_id' => $ztype_id

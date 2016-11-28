@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Venue;
+use App\Models\Venue;
 use InfyOm\Generator\Common\BaseRepository;
 
 class VenueRepository extends BaseRepository

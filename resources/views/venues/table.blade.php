@@ -2,18 +2,16 @@
     <thead>
         <th>Name</th>
         <th>Website</th>
-        <th>Facebook</th>
-        <th>Address Id</th>
-        <th>Phone</th>
-        <th colspan="3">Action</th>
+        <th>City</th>
+        <th width="130px">Phone</th>
+        <th width="100px" colspan="3">Action</th>
     </thead>
     <tbody>
     @foreach($venues as $venue)
         <tr>
             <td>{!! $venue->name !!}</td>
-            <td>{!! $venue->website !!}</td>
-            <td>{!! $venue->facebook !!}</td>
-            <td>{!! $venue->address_id !!}</td>
+            <td>{!! $venue->website ?? $venue->facebook !!}</td>
+            <td>{!! $venue->cityName . ', ' . $venue->stateName !!}</td>
             <td>{!! $venue->phone !!}</td>
             <td>
                 {!! Form::open(['route' => ['venues.destroy', $venue->id], 'method' => 'delete']) !!}

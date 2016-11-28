@@ -1,11 +1,13 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
+use App\Elegant;
+use Backpack\CRUD\CrudTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * App\DropDowns
+ * App\Models\DropDowns
  *
  * @property integer $id
  * @property \Carbon\Carbon $created_at
@@ -14,13 +16,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $name
  * @property string $code
  * @property string $value
- * @method static \Illuminate\Database\Query\Builder|\App\DropDowns whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\DropDowns whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\DropDowns whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\DropDowns whereDeletedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\DropDowns whereName($value)
- * @method static \Illuminate\Database\Query\Builder|\App\DropDowns whereCode($value)
- * @method static \Illuminate\Database\Query\Builder|\App\DropDowns whereValue($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\DropDowns whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\DropDowns whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\DropDowns whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\DropDowns whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\DropDowns whereName($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\DropDowns whereCode($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\DropDowns whereValue($value)
  * @mixin \Eloquent
  */
 class DropDowns extends Elegant {
@@ -28,6 +30,7 @@ class DropDowns extends Elegant {
 	protected $table = 'dropdowns';
 	public $timestamps = true;
 
+	use CrudTrait;
 	use SoftDeletes;
 
 	protected $dates = ['deleted_at'];

@@ -1,11 +1,12 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
+use App\Elegant;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * App\ArtistMember
+ * App\Models\ArtistMember
  *
  * @property integer $id
  * @property \Carbon\Carbon $created_at
@@ -13,12 +14,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Carbon\Carbon $deleted_at
  * @property integer $artist_id
  * @property integer $member_id
- * @method static \Illuminate\Database\Query\Builder|\App\ArtistMember whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\ArtistMember whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\ArtistMember whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\ArtistMember whereDeletedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\ArtistMember whereArtistId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\ArtistMember whereMemberId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistMember whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistMember whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistMember whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistMember whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistMember whereArtistId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistMember whereMemberId($value)
  * @mixin \Eloquent
  */
 class ArtistMember extends Elegant {
@@ -31,4 +32,19 @@ class ArtistMember extends Elegant {
 	protected $dates = ['deleted_at'];
 	protected $fillable = array('artist_id', 'member_id');
 
+	/**
+	 * @return \Illuminate\Database\Eloquent\Relations\HasOne
+	 */
+	public function artist()
+	{
+		return $this->hasOne(Artist::class);
+	}
+
+	/**
+	 * @return \Illuminate\Database\Eloquent\Relations\HasOne
+	 */
+	public function member()
+	{
+		return $this->hasOne(Member::class);
+	}
 }

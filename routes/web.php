@@ -12,16 +12,29 @@
 */
 //Route::feeds();
 
-use App\Gig;
+use Illuminate\Http\Request;
+use Roumen\Feed\Feed;
+
+Route::get('events', function()
+{
+	return view('events');
+});
 
 Route::get('/', function ()
 {
 	return view('welcome');
 });
+Route::get('getFeeds', function()
+{
+	$result = file_get_contents('http://giginfo.org/feed/shows?artist=1&when=past', 1);
+	return $result;
+});
+
 //Route::feeds();
-Route::get('feed/{criteria?}', function ($criteria = null)
+Route::get('feed/shows', function (Request $request)
 {
 	// create new feed
+	/** @var Feed $feed */
 	$feed = App::make("feed");
 
 	// multiple feeds are supported
@@ -31,26 +44,27 @@ Route::get('feed/{criteria?}', function ($criteria = null)
 	$feed->setCache(60, 'laravelFeedKey');
 
 	// check if there is cached feed and build new only if is not
-	if (!$feed->isCached())
+//	if (!$feed->isCached())
 	{
 		// creating rss feed with our most recent 20 posts
-		$posts = Gigs::getShows($criteria);
+		$posts = Gigs::getShows($request);
 		// set your feed's title, description, link, pubdate and language
-		$feed->title = 'Your title';
-		$feed->description = 'Your description';
-		$feed->logo = 'http://yoursite.tld/logo.jpg';
+		$feed->title = 'Shows';
+		$feed->description = 'Gig data';
+		$feed->logo = 'http://giginfo.org/img/giginfo_logo.png';
 		$feed->link = url('feed');
 		$feed->setDateFormat('datetime'); // 'datetime', 'timestamp' or 'carbon'
 		if (count($posts) > 0)
-			$feed->pubdate = $posts[0]->created_at;
+			$feed->pubdate = $posts[0]->start;
 		$feed->lang = 'en';
 		$feed->setShortening(true); // true or false
 		$feed->setTextLimit(100); // maximum length of description text
+		$feed->setView('vendor.feed.show');
 
 		foreach ($posts as $post)
 		{
 			// set item's title, author, url, pubdate, description, content, enclosure (optional)*
-			$feed->add($post->title, $post->author, URL::to($post->slug), $post->created, $post->description, $post->content);
+			$feed->add($post->name, $post->artistName, '', $post->start, $post->description, $post);
 		}
 
 	}
@@ -111,7 +125,7 @@ Route::get('feed/{criteria?}', function ($criteria = null)
 
 Route::resource('genre', 'GenreController');
 Route::resource('artist', 'ArtistController');
-Route::resource('venu', 'VenuController');
+Route::resource('venue', 'VenueController');
 Route::resource('member', 'MemberController');
 Route::resource('address', 'AddressController');
 Route::resource('country', 'CountryController');
@@ -144,12 +158,12 @@ Route::get('location/{query}', [
 //});
 
 //Route
-Route::get('search/autocomplete', 'SearchController@autocomplete');
+Route::get('search/{table}/{column}/{id?}', 'SearchController@autocomplete');
 
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index');
+Route::get('/home', ['as' => 'home', 'uses' => 'HomeController@index']);
 
 Route::resource('venues', 'VenueController');
 
@@ -174,3 +188,21 @@ Route::get('autocomplete', function ()
 });
 
 Route::get('find/{table?}', 'SearchController@find');
+
+Route::resource('gigs', 'GigController');
+
+Route::get('gigs/{id}/poster', 'GigController@poster');Route::get('manage-gigs', 'Crud\GigController@manageCrud');
+Route::resource('crudgigs','Crud\GigController');
+
+Route::group(['middleware'=>'auth'], function()
+{
+	Route::group(array('prefix' => 'admin'), function ()
+	{
+		CRUD::resource('gig', 'Admin\GigCrudController');
+		CRUD::resource('venue', 'Admin\VenueCrudController');
+		CRUD::resource('artist', 'Admin\ArtistCrudController');
+	});
+});
+
+Route::get('social/login/redirect/{provider}', ['uses' => 'Auth\AuthController@redirectToProvider', 'as' => 'social.login']);
+Route::get('social/login/{provider}', 'Auth\AuthController@handleProviderCallback');

@@ -1,16 +1,16 @@
 <table class="table table-responsive" id="addresses-table">
     <thead>
-        <th>City Id</th>
         <th>Street Number</th>
-        <th>Street Id</th>
+        <th>Street</th>
+        <th>City</th>
         <th colspan="3">Action</th>
     </thead>
     <tbody>
     @foreach($addresses as $address)
         <tr>
-            <td>{!! $address->city_id !!}</td>
             <td>{!! $address->street_number !!}</td>
-            <td>{!! $address->street_id !!}</td>
+            <td>{!! $address->streetName !!}</td>
+            <td>{!! $address->cityName !!}</td>
             <td>
                 {!! Form::open(['route' => ['addresses.destroy', $address->id], 'method' => 'delete']) !!}
                 <div class='btn-group'>

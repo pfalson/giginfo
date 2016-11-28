@@ -13,8 +13,8 @@
 			{!! Form::text('postallocation_id') !!}
 		</li>
 		<li>
-			{!! Form::label('longtitude', 'Longtitude:') !!}
-			{!! Form::text('longtitude') !!}
+			{!! Form::label('longitude', 'Longtitude:') !!}
+			{!! Form::text('longitude') !!}
 		</li>
 		<li>
 			{!! Form::label('latitude', 'Latitude:') !!}

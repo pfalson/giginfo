@@ -24,6 +24,7 @@
 
 @section('scripts')
     <!-- Typeahead.js Bundle -->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
     <script>
         jQuery(document).ready(function ($) {
@@ -37,7 +38,7 @@
                 queryTokenizer: Bloodhound.tokenizers.whitespace
             });
 
-            $("#city").typeahead({
+            $("#cityName").typeahead({
                 hint: true,
                 autoSelect: true,
                 highlight: true,

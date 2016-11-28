@@ -69,7 +69,7 @@
             @if (Route::has('login'))
                 <div class="top-right links">
                     <a href="{{ url('/login') }}">Login</a>
-                    <a href="{{ url('/register') }}">Register</a>
+                    {{--<a href="{{ url('/register') }}">Register</a>--}}
                 </div>
             @endif
 
@@ -80,6 +80,8 @@
                 <div class="m-b-md">
                     A place to store your band and gig details
                 </div>
+
+                <img src="img/giginfo_logo.png" alt="GigInfo">
 
                 <div class="m-b-md">
                     Under construction, comeback soon.

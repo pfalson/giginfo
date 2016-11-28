@@ -14,7 +14,7 @@
 @endif
         <updated>{{ $channel['pubdate'] }}</updated>
 @foreach($items as $item)
-        <entry>
+        <show>
             <author>
                 <name>{{ $item['author'] }}</name>
             </author>
@@ -24,6 +24,6 @@
             <summary type="html"><![CDATA[{!! $item['description'] !!}]]></summary>
             <content type="html"><![CDATA[{!! $item['content'] !!}]]></content>
             <updated>{{ $item['pubdate'] }}</updated>
-        </entry>
+        </show>
 @endforeach
 </feed>

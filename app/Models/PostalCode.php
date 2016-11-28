@@ -1,7 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
+use App\Elegant;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -14,22 +15,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $code
  * @property integer $city_id
  * @property integer $postallocation_id
- * @property string $longtitude
+ * @property string $longitude
  * @property string $latitude
  * @property integer $locationtype_id
  * @property integer $postcodetype_id
- * @method static \Illuminate\Database\Query\Builder|\App\PostalCode whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\PostalCode whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\PostalCode whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\PostalCode whereDeletedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\PostalCode whereCode($value)
- * @method static \Illuminate\Database\Query\Builder|\App\PostalCode whereCityId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\PostalCode wherePostallocationId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\PostalCode whereLongtitude($value)
- * @method static \Illuminate\Database\Query\Builder|\App\PostalCode whereLatitude($value)
- * @method static \Illuminate\Database\Query\Builder|\App\PostalCode whereLocationtypeId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\PostalCode wherePostcodetypeId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode whereCode($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode whereCityId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode wherePostallocationId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode whereLongtitude($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode whereLatitude($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode whereLocationtypeId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode wherePostcodetypeId($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode whereLongitude($value)
  */
 class PostalCode extends Elegant
 {
@@ -40,6 +42,6 @@ class PostalCode extends Elegant
 	use SoftDeletes;
 
 	protected $dates    = ['deleted_at'];
-	protected $fillable = array('code', 'postallocation_id', 'longtitude', 'latitude', 'locationtype_id', 'postcodetype_id', 'city_id');
+	protected $fillable = array('code', 'postallocation_id', 'longitude', 'latitude', 'locationtype_id', 'postcodetype_id', 'city_id');
 
 }

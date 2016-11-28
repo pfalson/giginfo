@@ -6,13 +6,14 @@
  * Time: 4:00 PM
  */
 
-namespace App;
+namespace App\Models;
 
 
+use App\Elegant;
 use App\Scopes\AgeScope;
 
 /**
- * App\Age
+ * App\Models\Age
  *
  * @property integer $id
  * @property \Carbon\Carbon $created_at
@@ -21,13 +22,13 @@ use App\Scopes\AgeScope;
  * @property string $name
  * @property string $code
  * @property string $value
- * @method static \Illuminate\Database\Query\Builder|\App\Age whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Age whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Age whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Age whereDeletedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Age whereName($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Age whereCode($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Age whereValue($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Age whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Age whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Age whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Age whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Age whereName($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Age whereCode($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Age whereValue($value)
  * @mixin \Eloquent
  */
 class Age extends Elegant

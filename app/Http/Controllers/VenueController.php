@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Forms\VenueForm;
-use App\Http\Requests\CreateVenueRequest;
 use App\Http\Requests\UpdateVenueRequest;
 use App\Repositories\VenueRepository;
-use App\Http\Controllers\AppBaseController;
 use Distilleries\FormBuilder\Facades\FormBuilder;
 use Distilleries\FormBuilder\States\FormStateTrait;
 use Illuminate\Http\Request;
@@ -46,10 +44,10 @@ class VenueController extends AppBaseController
 	{
 		$form = FormBuilder::create(VenueForm::class, [
 			'method' => 'POST',
-//			'url' => route('venue.store')
+			'url' => route('venues.store')
 		]);
 
-		return view('venue.create', compact('form'));
+		return view('venues.create', compact('form'));
 	}
 
 	public function store(FormBuilder $formBuilder)
@@ -148,7 +146,7 @@ class VenueController extends AppBaseController
             return redirect(route('venues.index'));
         }
 
-        $venue = $this->venueRepository->update($request->all(), $id);
+        $this->venueRepository->update($request->all(), $id);
 
         Flash::success('Venue updated successfully.');
 

@@ -8,9 +8,6 @@
 
 namespace App\Http\Controllers;
 
-
-use App\City;
-use App\User;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
@@ -18,21 +15,26 @@ use Response;
 
 class SearchController extends Controller
 {
-	public function autocomplete()
+	public function autocomplete($table, $column, $id = null)
 	{
-		$term = Input::get('term');
-
-		$results = array();
-
-		$queries = DB::table('cities')
-			->where('name', 'LIKE', '%' . $term . '%')
-			->take(25)->get();
-
-		foreach ($queries as $query)
+		if ($id !== null)
 		{
-			$results[] = ['id' => $query->id, 'value' => $query->name];
+			return Response::json(DB::table($table)->where(compact('id'))->get()->first());
 		}
+
+		$term = Input::get('q');
+
+		$results = DB::table($table)
+			->where($column, 'LIKE', '%' . $term . '%')
+			->paginate();;
+
 		return Response::json($results);
+	}
+
+	public function getRecord($id)
+	{
+		$city = \App\Models\City::findOrFail($id);
+		return \Response::json($city);
 	}
 
 	public function find(Request $request, $table)

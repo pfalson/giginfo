@@ -1,11 +1,12 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
+use App\Elegant;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * App\Member
+ * App\Models\Member
  *
  * @property integer $id
  * @property \Carbon\Carbon $created_at
@@ -14,13 +15,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $name
  * @property boolean $primary_role
  * @property string $biography
- * @method static \Illuminate\Database\Query\Builder|\App\Member whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Member whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Member whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Member whereDeletedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Member whereName($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Member wherePrimaryRole($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Member whereBiography($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Member whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Member whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Member whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Member whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Member whereName($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Member wherePrimaryRole($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Member whereBiography($value)
  * @mixin \Eloquent
  */
 class Member extends Elegant {
@@ -32,4 +33,5 @@ class Member extends Elegant {
 
 	protected $dates = ['deleted_at'];
 
+	protected $fillable = ['name', 'primary_role', 'biography'];
 }

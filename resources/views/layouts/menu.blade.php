@@ -10,3 +10,7 @@
     <a href="{!! route('addresses.index') !!}"><i class="fa fa-edit"></i><span>Addresses</span></a>
 </li>
 
+<li class="{{ Request::is('gigs*') ? 'active' : '' }}">
+    <a href="{!! route('gigs.index') !!}"><i class="fa fa-edit"></i><span>Gigs</span></a>
+</li>
+

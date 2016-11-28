@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class RenameGigTable extends Migration
 {
+	const table = 'gig';
     /**
      * Run the migrations.
      *
@@ -13,7 +12,7 @@ class RenameGigTable extends Migration
      */
     public function up()
     {
-        //
+        Schema::rename(static::table, static::table . 's');
     }
 
     /**
@@ -23,6 +22,6 @@ class RenameGigTable extends Migration
      */
     public function down()
     {
-        //
+	    Schema::rename(static::table . 's', static::table);
     }
 }

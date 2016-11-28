@@ -18,8 +18,8 @@
 
 <!-- Address Id Field -->
 <div class="form-group col-sm-6">
-    {!! Form::label('address_id', 'Address Id:') !!}
-    {!! Form::number('address_id', null, ['class' => 'form-control']) !!}
+    {!! Form::label('address', 'Address :') !!}
+    {!! Form::text('address', null, ['class' => 'form-control']) !!}
 </div>
 
 <!-- Phone Field -->
