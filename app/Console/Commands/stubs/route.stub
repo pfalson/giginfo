@@ -1,0 +1,2 @@
+Route::get('manage-{{table_name}}', 'Crud\{{ClassName}}Controller@manageCrud');
+Route::resource('crud{{table_name}}','Crud\{{ClassName}}Controller');
