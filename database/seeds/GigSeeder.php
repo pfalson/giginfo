@@ -27,13 +27,13 @@ class GigSeeder extends Seeder
 //			var_dump($query->bindings);
 //		});
 
-		$age = DropDowns::firstOrCreate(
-			[
-				'name' => 'age',
-				'code' => $Age_Limit,
-				'value' => $Age_Limit
-			]
-		);
+//		$age = DropDowns::firstOrCreate(
+//			[
+//				'name' => 'age',
+//				'code' => $Age_Limit,
+//				'value' => $Age_Limit
+//			]
+//		);
 
 		$establishment = VenueType::firstOrCreate(
 			[
@@ -134,6 +134,14 @@ class GigSeeder extends Seeder
 						'address_id' => $address->id,
 						'phone' => $Venue_Phone,
 						'venuetype_id' => $establishment->id
+					]
+				);
+
+				$age = DropDowns::firstOrCreate(
+					[
+						'name' => 'age',
+						'code' => $Age_Limit,
+						'value' => $Age_Limit
 					]
 				);
 

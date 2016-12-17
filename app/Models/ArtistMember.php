@@ -21,6 +21,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistMember whereArtistId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistMember whereMemberId($value)
  * @mixin \Eloquent
+ * @property-read \App\Models\Artist $artist
+ * @property-read \App\Models\Member $member
  */
 class ArtistMember extends Elegant {
 

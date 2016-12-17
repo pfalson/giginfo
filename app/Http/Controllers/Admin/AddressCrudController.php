@@ -15,6 +15,8 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 // VALIDATION: change the requests to match your own file names if you need form validation
 use App\Http\Requests\AddressRequest as StoreRequest;
 use App\Http\Requests\AddressRequest as UpdateRequest;
+use Exception;
+use Request;
 
 class AddressCrudController extends CrudController
 {
@@ -135,7 +137,7 @@ class AddressCrudController extends CrudController
 			if ($country)
 			{
 				$args = ['country_id' => $country->id];
-				foreach (['name' => 'state', 'abbr' => 'abbr'] as $key => $item)
+				foreach (['states.name' => 'state', 'abbr' => 'abbr'] as $key => $item)
 				{
 					if (!empty($params[$item]))
 					{
@@ -151,7 +153,7 @@ class AddressCrudController extends CrudController
 				}
 				if ($state)
 				{
-					$args = ['name' => $params['city'], 'state_id' => $state->id];
+					$args = ['cities.name' => $params['city'], 'state_id' => $state->id];
 					$city = City::where($args)->firstOrCreate($args);
 					if ($city)
 					{
@@ -198,5 +200,73 @@ class AddressCrudController extends CrudController
 		}
 
 		return $address;
+	}
+
+	/**
+	 * @param Request $request
+	 * @return PostalCode
+	 */
+	public static function getLocation($request)
+	{
+		$path = $request->getPathInfo();
+
+		$city = $lat = $long = 0;
+
+		$postalcode = null;
+
+		try
+		{
+			$geoplugin = unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip=' . $request->ip()));
+
+			if (is_numeric($geoplugin['geoplugin_latitude']) && is_numeric($geoplugin['geoplugin_longitude']))
+			{
+				$lat = $geoplugin['geoplugin_latitude'];
+				$long = $geoplugin['geoplugin_longitude'];
+				$cityName = $geoplugin['geoplugin_city'];
+				$region = $geoplugin['geoplugin_region'];
+				$countryCode = $geoplugin['geoplugin_countryCode'];
+				$countryName = $geoplugin['geoplugin_countryName'];
+				$country = Country::whereName($countryName)->orWhere('sortname', 'like', $countryCode . '%')->first();
+
+				if ($country != null)
+				{
+					$state = State::whereCountryId($country->id)->where('abbr', $region)->first();
+
+					if ($state != null)
+					{
+						$city = City::whereStateId($state->id)->where('cities.name', $cityName)->first();
+
+						if ($city != null)
+						{
+							$postalcode = PostalCode::whereCityId($city->id)->first();
+						}
+					}
+				}
+
+				if (!$postalcode)
+				{
+					$latitude = number_format(floor($lat * 100) / 100, 2, '.', '');
+					$longitude = number_format(floor($long * 100) / 100, 2, '.', '');
+					$postalcode = PostalCode::whereLatitude($latitude)->whereLongitude($longitude)->first();
+				}
+			}
+		} catch (Exception $ex)
+		{
+		}
+
+
+		if (!$postalcode)
+		{
+			$postalcode = new PostalCode();
+			if ($city)
+			{
+				$postalcode->city_id = $city->id;
+			}
+		}
+
+		$postalcode->longitude = $long;
+		$postalcode->latitude = $lat;
+
+		return $postalcode;
 	}
 }

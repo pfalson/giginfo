@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Models\Address;
+use App\Address;
 use InfyOm\Generator\Common\BaseRepository;
 
 class AddressRepository extends BaseRepository

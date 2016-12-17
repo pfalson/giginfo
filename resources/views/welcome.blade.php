@@ -78,13 +78,15 @@
                     Gig Info
                 </div>
                 <div class="m-b-md">
-                    A place to store your band and gig details
+                    <p>A place for artists to store gigs</p>
+                    and
+                    <p>for people looking for gigs</p>
                 </div>
 
                 <img src="img/giginfo_logo.png" alt="GigInfo">
 
                 <div class="m-b-md">
-                    Under construction, comeback soon.
+                    <a href="/gigs">Look for gigs</a>
                 </div>
 
                 <div class="m-b-md">

@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Models\Member;
+use App\Member;
 use InfyOm\Generator\Common\BaseRepository;
 
 class MemberRepository extends BaseRepository

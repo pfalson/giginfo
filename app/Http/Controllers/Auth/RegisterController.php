@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\ArtistRole;
+use App\Models\Member;
 use App\User;
-use Redirect;
 use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -37,11 +38,19 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
-	    Redirect::to('/')->send();
-//	    $this->middleware('guest');
+	    $this->middleware('guest');
     }
 
-    /**
+	/**
+	 * @param User $user
+	 */
+	public static function createMember($user)
+	{
+		$memberRole = ArtistRole::whereCode('m')->first();
+		Member::create(['user_id' => $user->id, 'primary_role' => $memberRole->id]);
+	}
+
+	/**
      * Get a validator for an incoming registration request.
      *
      * @param  array  $data
@@ -64,10 +73,14 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $user =  User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
         ]);
+
+	    self::createMember($user);
+
+	    return $user;
     }
 }

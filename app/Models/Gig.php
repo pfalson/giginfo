@@ -5,11 +5,15 @@ namespace App\Models;
 use App\Elegant;
 use App\Scopes\GigScope;
 use Backpack\CRUD\CrudTrait;
+use Carbon\Carbon;
 use Exception;
+use File;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Image;
 use Log;
+use Illuminate\Http\Request;
 use Response;
+use Storage;
 
 /**
  * Class Gig
@@ -49,6 +53,8 @@ use Response;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Gig whereTicketurl($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Gig whereDeletedAt($value)
  * @mixin \Eloquent
+ * @property-read mixed $venuetype
+ * @property-read mixed $house
  */
 class Gig extends Elegant
 {
@@ -77,7 +83,8 @@ class Gig extends Elegant
 		'price',
 		'age',
 		'name',
-		'ticketurl'
+		'ticketurl',
+		'type'
 	];
 
 	/**
@@ -96,16 +103,6 @@ class Gig extends Elegant
 		'type'        => 'integer',
 		'name'        => 'string',
 		'ticketurl'   => 'string'
-	];
-
-	/**
-	 * Validation rules
-	 *
-	 * @var array
-	 */
-	public static $rules = [
-		'artist_id' => 'required|exists:artists,id',
-		'venue_id'  => 'required|exists:venues,id'
 	];
 
 	/**
@@ -154,8 +151,9 @@ class Gig extends Elegant
 		return $this->venue->details;
 	}
 
-	public function setPosterAttribute($value)
+	public function old_setPosterAttribute($value)
 	{
+		Log::error('setPosterAttribute');
 		$attribute_name = "poster";
 
 		// if the image was erased
@@ -168,11 +166,89 @@ class Gig extends Elegant
 				$value = $img->getEncoded();
 			} catch (Exception $e)
 			{
-				Log::alert($e->getMessage());
+				Log::error($e->getMessage());
 				$value = null;
 			}
 		}
 
 		$this->attributes[$attribute_name] = $value;
+	}
+
+	public function setPosterAttribute($value)
+	{
+		$attribute_name = "poster";
+		$disk = "public";
+		$destination_path = "uploads/artists/" . $this->artist_id;
+
+		// if the image was erased
+		if ($value == null)
+		{
+			// delete the image from disk
+			Storage::disk($disk)->delete($this->image);
+
+			// set null in the database column
+			$this->attributes[$attribute_name] = null;
+		}
+
+// if a base64 was sent, store it in the db
+		if (starts_with($value, 'data:image'))
+		{
+			// 0. Make the image
+			$image = Image::make($value);
+			// 1. Generate a filename.
+			$filename = md5($value . time()) . '.jpg';
+			// 2. Store the image on disk.
+			$dir = public_path() . '/' . $destination_path;
+
+			if (!File::exists($dir))
+			{
+				$result = File::makeDirectory($dir, 0777, true);
+			}
+
+			$image->save($dir . '/' . $filename);
+
+			// 3. Save the path to the database
+			$this->attributes[$attribute_name] = $destination_path . '/' . $filename;
+		}
+	}
+
+	public function getShows(Request $request)
+	{
+		$artist_id = $request->input('artist');
+		$when = $request->input('when');
+		$builder = Gig::where(compact('artist_id'));
+
+		$now = Carbon::now();
+		$direction = 'asc';
+
+		switch ($when)
+		{
+			case 'future':
+				$builder = $builder->where('start', '>=', $now);
+				break;
+			case 'past':
+				$builder = $builder->where('start', '<', $now);
+				$direction = 'desc';
+				break;
+		}
+
+		return $builder
+			->select(
+				'artists.name as artistName',
+				'gigs.id',
+				'gigs.name',
+				'gigs.description',
+				'gigs.start',
+				'gigs.poster',
+				'venues.name as venueName',
+				'venues.website as venueURI',
+				'addresses.street_number',
+				'streets.name as streetName',
+				'cities.name as cityName',
+				'states.abbr',
+				'countries.sortname as countryCode',
+				'ageValue'
+			)->orderBy('start', $direction)
+			->get();
 	}
 }

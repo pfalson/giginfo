@@ -15,6 +15,7 @@
 use Illuminate\Http\Request;
 use Roumen\Feed\Feed;
 
+
 Route::get('events', function()
 {
 	return view('events');
@@ -41,7 +42,7 @@ Route::get('feed/shows', function (Request $request)
 	// if you are using caching you should set different cache keys for your feeds
 
 	// cache the feed for 60 minutes (second parameter is optional)
-	$feed->setCache(60, 'laravelFeedKey');
+//	$feed->setCache(60, 'laravelFeedKey');
 
 	// check if there is cached feed and build new only if is not
 //	if (!$feed->isCached())
@@ -139,7 +140,7 @@ Route::resource('artistmember', 'ArtistMemberController');
 Route::resource('instrument', 'InstrumentController');
 Route::resource('memberinstrument', 'MemberInstrumentController');
 Route::resource('dropdowns', 'DropDownsController');
-Route::resource('gig', 'GigController');
+Route::resource('gigs', 'GigController');
 Route::resource('postcodetype', 'PostCodeTypeController');
 
 //Route::get('/', function ()
@@ -191,12 +192,18 @@ Route::get('find/{table?}', 'SearchController@find');
 
 Route::resource('gigs', 'GigController');
 
-Route::get('gigs/{id}/poster', 'GigController@poster');Route::get('manage-gigs', 'Crud\GigController@manageCrud');
+//Route::get('mapdemo1', function()
+//{
+//	return view('venues.mapdemo1');
+//});
+
+Route::get('gigs/{id}/poster', 'GigController@poster');
+Route::get('manage-gigs', 'Crud\GigController@manageCrud');
 Route::resource('crudgigs','Crud\GigController');
 
 Route::group(['middleware'=>'auth'], function()
 {
-	Route::group(array('prefix' => 'admin'), function ()
+	Route::group(['prefix' => 'admin'], function ()
 	{
 		CRUD::resource('gig', 'Admin\GigCrudController');
 		CRUD::resource('venue', 'Admin\VenueCrudController');

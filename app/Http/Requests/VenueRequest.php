@@ -74,7 +74,7 @@ class VenueRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
 	public function messages()
 	{
 		return [
-			//
+			'name.unique_with' => '"@name@" has already been used for this address'
 		];
 	}
 }

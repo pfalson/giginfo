@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Elegant;
+use App\Scopes\CityScope;
 use Backpack\CRUD\CrudTrait;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Nicolaslopezj\Searchable\SearchableTrait;
@@ -47,6 +48,18 @@ class City extends Elegant
 			'cities.name' => 10,
 		],
 	];
+
+	/**
+	 * The "booting" method of the model.
+	 *
+	 * @return void
+	 */
+	public static function boot()
+	{
+		parent::boot();
+
+		static::addGlobalScope(new CityScope());
+	}
 
 	public function state()
 	{

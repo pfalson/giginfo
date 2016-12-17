@@ -5,10 +5,11 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateArtistMembersTable extends Migration
 {
+	const tableName = 'artist_members';
 
 	public function up()
 	{
-		Schema::create('artist_members', function (Blueprint $table)
+		Schema::create(static::tableName, function (Blueprint $table)
 		{
 			$table->engine = 'InnoDB';
 			$table->increments('id');
@@ -21,6 +22,6 @@ class CreateArtistMembersTable extends Migration
 
 	public function down()
 	{
-		Schema::drop('artist_members');
+		Schema::drop(static::tableName);
 	}
 }

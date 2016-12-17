@@ -5,9 +5,13 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Log;
 
 class Handler extends ExceptionHandler
 {
+	const sessionExpired = 'Sorry, your session seems to have expired. Please try again.';
+	const cookiesRemoved = 'An error has occurred. If you recently cleared your cookies please try again';
+
     /**
      * A list of the exception types that should not be reported.
      *
@@ -30,9 +34,13 @@ class Handler extends ExceptionHandler
      * @param  \Exception  $exception
      * @return void
      */
-    public function report(Exception $exception)
+    public function report(Exception $e)
     {
-        parent::report($exception);
+	    // Don't report VerifyCSRFToken mismatch if the cookies were removed
+	    if ($this->notMissingToken($e))
+	    {
+		    parent::report($e);
+	    }
     }
 
     /**
@@ -62,4 +70,20 @@ class Handler extends ExceptionHandler
 
         return redirect()->guest('login');
     }
+
+	/**
+	 * @param Exception $e
+	 * @return bool
+	 */
+	private function notMissingToken(Exception $e)
+	{
+		$result = $e instanceof TokenMismatchException && (!array_key_exists('laravel_session', $_COOKIE) || !array_key_exists('XSRF-TOKEN', $_COOKIE));
+
+		if ($result)
+		{
+			Log::error('TokenMismatchException: missing laravel_session/XSRF-TOKEN cookies');
+		}
+
+		return !$result;
+	}
 }

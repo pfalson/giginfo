@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Instrument whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Instrument whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Instrument whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Instrument whereName($value)
  */
 class Instrument extends Elegant {
 

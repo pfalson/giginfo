@@ -28,7 +28,11 @@ class GigRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
 	public function rules()
 	{
 		return [
-			// 'name' => 'required|min:5|max:255'
+			'start'     => 'required',
+			'finish'    => 'required',
+			'artist_id' => 'required|exists:artists,id',
+			'venue_id'  => 'required|exists:venues,id',
+			'name'      => 'required|unique_with:gigs,name,@id,artist_id,@artist_id'
 		];
 	}
 
@@ -52,7 +56,8 @@ class GigRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
 	public function messages()
 	{
 		return [
-			//
+			'venue_id.required' => 'Please choose a venue',
+			'name.unique_with' => '"@name@" has already been used'
 		];
 	}
 

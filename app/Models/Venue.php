@@ -35,6 +35,9 @@ use Venturecraft\Revisionable\RevisionableTrait;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Venue whereDeletedAt($value)
  * @mixin \Eloquent
  * @property-read \Illuminate\Database\Eloquent\Collection|\Venturecraft\Revisionable\Revision[] $revisionHistory
+ * @property integer $venuetype_id
+ * @property-read \App\Models\VenueType $venuetype
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Venue whereVenuetypeId($value)
  */
 class Venue extends Elegant
 {
@@ -49,7 +52,7 @@ class Venue extends Elegant
 
 
 	protected $dates = ['deleted_at'];
-
+	protected $appends = ['details'];
 
 	public $fillable = [
 		'name',

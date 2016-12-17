@@ -8,7 +8,6 @@ use Illuminate\Validation\Validator;
 
 class CustomValidation extends Validator
 {
-
 	// Laravel keeps a certain convention for rules
 	// So the function is called validateGreaterThen
 	// Then the rule is greater_then
@@ -34,13 +33,43 @@ class CustomValidation extends Validator
 		// If you don't understand this, please let me know
 		$result = DB::table($parameters[0])->where(function ($query) use ($attribute, $value, $parameters)
 		{
+			$column = null;
+			foreach ($parameters as $parameter)
+			{
+				if (substr($parameter, 0, 1) === '@')
+				{
+					$param_value = array_get($this->getData(), substr($parameter, 1));
+					if ($param_value !== null)
+					{
+						if ($parameter === '@id')
+						{
+							$column = 'id';
+							$op = '!=';
+						}
+						else
+						{
+							$op = '=';
+						}
+
+						$query = $query->where($column, $op, $param_value);
+					}
+				}
+				$column = $parameter;
+			}
 			/** @var Builder $query */
-			$query->where('id', '!=', $parameters[2])
-				->where($attribute, $value)
-				->where($parameters[3], $parameters[4])
+			$query->where($attribute, $value)
 				->whereNull('deleted_at');
         })->first();
 
 		return $result ? false : true;
+	}
+
+	public function replaceUniqueWith($message, $attribute, $rule, $parameters)
+	{
+		foreach ($this->getData() as $key => $value)
+		{
+			$message = str_replace('@' . $key . '@', $value, $message);
+		}
+		return $message;
 	}
 }

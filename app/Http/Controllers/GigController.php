@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Admin\AddressCrudController;
 use App\Http\Requests\CreateGigRequest;
 use App\Http\Requests\UpdateGigRequest;
 use App\Repositories\GigRepository;
+use Carbon\Carbon;
+use File;
 use Illuminate\Http\Request;
 use Flash;
 use Intervention\Image\Facades\Image;
@@ -29,11 +32,19 @@ class GigController extends AppBaseController
 	 */
 	public function index(Request $request)
 	{
-		$this->gigRepository->pushCriteria(new RequestCriteria($request));
-		$gigs = $this->gigRepository->all();
+		$postalcode = AddressCrudController::getLocation($request);
 
-		return view('gigs.index')
-			->with('gigs', $gigs);
+		$this->gigRepository->pushCriteria(new RequestCriteria($request));
+		$gigs = $this->gigRepository->orderBy('start')->all()
+			->where('start', '>=', Carbon::yesterday())
+			->where('finish', '>', Carbon::now())
+		;
+
+//		$gigs = Gig::where('start', Carbon::now()->toDateString());//->where('finish', '< > NOW()')->get();
+//		$gigs = $gigs->get();
+
+		return view('gigs.browse')
+			->with(['gigs' => $gigs, 'postalcode' => $postalcode]);
 	}
 
 	/**
@@ -183,6 +194,20 @@ class GigController extends AppBaseController
 			abort(404);
 		}
 
-		return $gig->poster;
+		$response = '';
+		if ($gig->poster)
+		{
+			$path = public_path() . '/' . $gig->poster;
+
+			if(!File::exists($path)) abort(404);
+
+			$file = File::get($path);
+			$type = File::mimeType($path);
+
+			$response = Response::make($file, 200);
+			$response->header("Content-Type", $type);
+		}
+
+		return $response;
 	}
 }

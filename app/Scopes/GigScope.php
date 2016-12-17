@@ -2,6 +2,8 @@
 
 namespace App\Scopes;
 
+use App\Models\Member;
+use Auth;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -22,12 +24,28 @@ class GigScope implements Scope
 	 */
 	public function apply(Builder $builder, Model $model)
 	{
+		$request = \Request::getPathInfo();
+		if (starts_with($request, '/admin/gig/')) return;
+
+		$builder->join('artists as b', 'b.id', 'artist_id');
+
+		$builder->whereRaw('gigs.deleted_at is null');
+
+		$user = Auth::user();
+		if ($user !== null)
+		{
+			$member = Member::where('user_id', $user->id)->first();
+			$builder = $builder->join('artist_members', function ($join) use ($member)
+			{
+				$join->on('b.id', 'artist_members.artist_id')->where('member_id', $member->id);
+			});
+		}
+
 		$builder
 			->join('venues as v', 'v.id', 'venue_id')
 			->join('dropdowns as dd', 'dd.id', 'age')
-			->join('artists as b', 'b.id', 'artist_id')
 			->join('addresses as a', 'a.id', 'v.address_id')
-			->join('streets as s','s.id','a.street_id')
+			->join('streets as s', 's.id', 'a.street_id')
 			->join('postalcodes as p', 'p.id', 'a.postalcode_id')
 			->join('cities as c', 'c.id', 'p.city_id')
 			->join('states as st', 'st.id', 'c.state_id')
@@ -37,14 +55,17 @@ class GigScope implements Scope
 				'b.name as artistName',
 				'v.name as venueName',
 				'a.street_number',
+				'a.longitude as longitude',
+				'a.latitude as latitude',
 				's.name as streetName',
 				'c.name as cityName',
 				'st.name as stateName',
 				'co.name as countryName',
 				'co.sortname as countryCode',
 				'dd.value as ageValue',
-				DB::raw("CONCAT(a.street_number,' ',s.name,' ',c.name,', ',st.name,', ',co.sortname) as address"),
-				DB::raw("CONCAT(street_number,' ',s.name,', ',c.name,', ',st.name,', ',co.name) as house")
-			]);
+				DB::raw("@address:=CONCAT(@street:=CONCAT(a.street_number,' ',s.name,' ',c.name,', ',st.name),', ',co.name) as address"),
+				DB::raw("@house:=CONCAT(@street,', ',co.name) as house"),
+				DB::raw("@info:=CONCAT(TRIM(LEADING '0' FROM REPLACE(DATE_FORMAT(start, '%h:%i%p %D %b'),':00','')),' - ',b.name,' at ',v.name, RTRIM(CONCAT(' ', IFNULL(price, '')))) as info")
+			])->orderBy('start', 'desc');
 	}
 }

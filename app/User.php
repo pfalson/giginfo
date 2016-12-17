@@ -2,11 +2,10 @@
 
 namespace App;
 
-use Backpack\CRUD\CrudTrait;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Nicolaslopezj\Searchable\SearchableTrait;
-use Backpack\Base\app\Notifications\ResetPasswordNotification as ResetPasswordNotification;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 /**
  * App\User
@@ -34,7 +33,6 @@ use Backpack\Base\app\Notifications\ResetPasswordNotification as ResetPasswordNo
  */
 class User extends Authenticatable
 {
-	use CrudTrait;
     use Notifiable;
 	use SearchableTrait;
 
@@ -61,15 +59,4 @@ class User extends Authenticatable
 			'name' => 10
 		]
 	];
-
-	/**
-	 * Send the password reset notification.
-	 *
-	 * @param  string  $token
-	 * @return void
-	 */
-	public function sendPasswordResetNotification($token)
-	{
-		$this->notify(new ResetPasswordNotification($token));
-	}
 }

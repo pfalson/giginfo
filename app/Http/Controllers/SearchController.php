@@ -8,7 +8,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Elegant;
 use DB;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Response;
@@ -17,24 +19,45 @@ class SearchController extends Controller
 {
 	public function autocomplete($table, $column, $id = null)
 	{
+		/** @var Elegant|Builder $class */
+		$builder = null;
+
+		$className = 'App\\Models\\' . $table;
+
+		if (class_exists($className))
+		{
+			$builder = new $className;
+			$table = $builder->getTable();
+		}
+		else
+		{
+			$builder = DB::table($table);
+		}
+
+		if ($id != null)
+		{
+			$column = $table . '.id';
+		}
+		else
+		{
+			$column = $table . '.' . $column;
+		}
+
 		if ($id !== null)
 		{
-			return Response::json(DB::table($table)->where(compact('id'))->get()->first());
+			return Response::json($builder->where($column, $id)->get()->first());
 		}
 
 		$term = Input::get('q');
 
-		$results = DB::table($table)
+		$results = $builder
 			->where($column, 'LIKE', '%' . $term . '%')
-			->paginate();;
+			->orWhereRaw('replace(' . $column . ', "\'", "") LIKE "%' . trim($term, "'") . '%"')
+//			->orWhereRaw('soundex(' . $column . ') LIKE "' . rtrim(soundex($term), '0') . '%"')
+			->orderBy($column)
+			->paginate();
 
 		return Response::json($results);
-	}
-
-	public function getRecord($id)
-	{
-		$city = \App\Models\City::findOrFail($id);
-		return \Response::json($city);
 	}
 
 	public function find(Request $request, $table)

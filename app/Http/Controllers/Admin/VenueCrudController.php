@@ -7,13 +7,19 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 // VALIDATION: change the requests to match your own file names if you need form validation
 use App\Http\Requests\VenueRequest as StoreRequest;
 use App\Http\Requests\VenueRequest as UpdateRequest;
+use Illuminate\Support\ViewErrorBag;
+use Request;
+use Response;
 use URL;
+use View;
 
 class VenueCrudController extends CrudController
 {
 
 	public function setUp()
 	{
+		$previous = URL::previous();
+		$postalcode = AddressCrudController::getLocation($this->request);
 
 		/*
 		|--------------------------------------------------------------------------
@@ -39,13 +45,53 @@ class VenueCrudController extends CrudController
 		| BASIC CRUD INFORMATION
 		|--------------------------------------------------------------------------
 		*/
-		$this->crud->addField(
-			[
-				'name'  => 'redirect_after_save',
-				'label' => '',
-				'value' => URL::previous(),
-				'type'  => 'hidden'
-			]);
+
+		if (str_contains($previous, '/gig/create'))
+		{
+			$this->crud->modal = true;
+			$scripts = [];
+			$scripts[] = "$(document).ready(function(){
+    $(':submit').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/admin/venue',
+            type: 'post',
+            data: $('form').serialize(),
+            success: function(data){
+                if (typeof data.error !== 'undefined') {
+                    showErrors(jQuery.parseJSON(data));
+                } else {
+                    $.cookie.json = true;
+                    $.cookie('venue_added', data, {path: '/'});
+                    window.open('','_self').close();
+                }
+            },
+            error: function (data) {
+                var errors = jQuery.parseJSON(data.responseText);
+                showErrors(errors);
+            }
+        });
+    });
+});
+function showErrors(errors) {
+    $('#errors_div').show();
+    var cList = $('#error_list');
+    cList.empty();
+    jQuery.each(errors, function () {
+        var li = $('<li>' + this[0] + '</li>').appendTo(cList);
+    });
+}";
+
+
+			$this->crud->scripts = implode(PHP_EOL, $scripts);
+			$this->crud->addField(
+				[
+					'name'  => 'redirect_after_save',
+					'label' => '',
+					'value' => $previous,
+					'type'  => 'hidden'
+				]);
+		}
 
 		// ------ CRUD FIELDS
 		$this->crud->addField([
@@ -55,11 +101,13 @@ class VenueCrudController extends CrudController
 			'address_type'   => 'establishment',
 			'google_api_key' => env('GOOGLE_MAP_JS_API_KEY'),
 			'current'        => false,
+			'long'           => $postalcode->longitude,
+			'lat'            => $postalcode->latitude,
 			'components'     => [
 				'name'          => [
 					'name'     => 'name',
 					'label'    => 'Name',
-					'readOnly' => true
+					'readOnly' => false
 				],
 				'website'       => [
 					'name'  => 'website',
@@ -228,6 +276,34 @@ class VenueCrudController extends CrudController
 		// $this->crud->orderBy();
 		// $this->crud->groupBy();
 		// $this->crud->limit();
+	}
+
+	public function create()
+	{
+		/** @var View $response */
+		$response = parent::create();
+
+		/** @var Request $request */
+		$request = $this->request;
+
+		if ($request->method() === 'POST' && $request->ajax())
+		{
+			$flash = $request->session()->get('flash_notification');
+			/** @var ViewErrorBag $errors */
+			$errors = $request->session()->get('errors');
+			if ($errors->count() > 0 || !empty($flash))
+			{
+				$data = $flash;
+				if ($errors->count())
+				{
+					$data = $errors->getBags();
+				}
+
+				return Response::json($data);
+			}
+		}
+
+		return $response;
 	}
 
 	public function store(StoreRequest $request)
