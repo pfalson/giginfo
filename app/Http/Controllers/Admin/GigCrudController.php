@@ -191,9 +191,9 @@ function getCookie(cname) {
 					'type'               => 'select2_ajax',
 					'name'               => 'venue_id', // the db column for the foreign key
 					'entity'             => 'venue', // the method that defines the relationship in your Model
-					'attribute'          => 'name', // foreign key attribute that is shown to user
+					'attribute'          => 'details', // foreign key attribute that is shown to user
 					'model'              => "App\Models\Venue", // foreign key model
-					'datasource'         => url("search/venues/name"), // url to controller search function (with /{id} should return model)
+					'datasource'         => url("search/Venue/details"), // url to controller search function (with /{id} should return model)
 					'minimumInputLength' => 0
 				]);
 

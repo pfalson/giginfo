@@ -40,8 +40,8 @@ class VenueScope implements Scope
 				'st.name as state',
 				'co.name as country',
 				'co.sortname as sortname',
-				DB::raw("CONCAT(street_number,' ',s.name,' ',c.name,', ',st.name,', ',co.name) as address"),
-				DB::raw("CONCAT(venues.name,' ',street_number,' ',s.name,', ',c.name,', ',st.name,', ',co.name) as details")
+				DB::raw("CONCAT(street_number,' ',s.name,' ',c.name,', ',st.name,', ',co.name) COLLATE utf8_bin as address"),
+				DB::raw("CONCAT(venues.name,' ',street_number,' ',s.name,', ',c.name,', ',st.name,', ',co.name) COLLATE utf8_bin as details")
 			]);
 	}
 }

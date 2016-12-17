@@ -27,6 +27,7 @@ class SearchController extends Controller
 		if (class_exists($className))
 		{
 			$builder = new $className;
+			/** @noinspection PhpUndefinedMethodInspection */
 			$table = $builder->getTable();
 		}
 		else
@@ -48,13 +49,28 @@ class SearchController extends Controller
 			return Response::json($builder->where($column, $id)->get()->first());
 		}
 
-		$term = Input::get('q');
+		$value = Input::get('q');
+
+		if (method_exists($builder, 'autocomplete'))
+		{
+			$builder = $builder->autocomplete();
+		}
+
+		$builder =  DB::table(DB::raw("({$builder->toSql()}) as " . $table))
+			->mergeBindings($builder->getQuery());// you need to get underlying Query Builder
+
+
+		if (!empty($value))
+		{
+			{
+				$builder = $builder
+					->where($column, 'LIKE', '%' . $value . '%')
+					->orWhereRaw('replace(' . $column . ', "\'", "") LIKE "%' . trim($value, "'") . '%"');
+			}
+		}
 
 		$results = $builder
-			->where($column, 'LIKE', '%' . $term . '%')
-			->orWhereRaw('replace(' . $column . ', "\'", "") LIKE "%' . trim($term, "'") . '%"')
-//			->orWhereRaw('soundex(' . $column . ') LIKE "' . rtrim(soundex($term), '0') . '%"')
-			->orderBy($column)
+			->orderByRaw($column. ' COLLATE utf8_bin ASC')
 			->paginate();
 
 		return Response::json($results);
