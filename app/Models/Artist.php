@@ -25,13 +25,20 @@ use DB;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Artist whereFacebook($value)
  * @mixin \Eloquent
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Gig[] $gigs
+ * @property integer $city_id
+ * @property-read \App\Models\City $city
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Artist whereCityId($value)
+ * @property string $description
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Genre[] $genres
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Artist whereDescription($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Artist details()
  */
 class Artist extends Elegant
 {
 
 	protected $table      = 'artists';
 	public    $timestamps = true;
-	protected $fillable   = array('name', 'city_id', 'website', 'facebook');
+	protected $fillable   = array('name', 'description', 'city_id', 'website', 'facebook');
 
 	use CrudTrait;
 
@@ -44,12 +51,17 @@ class Artist extends Elegant
 	{
 		parent::boot();
 
-		static::addGlobalScope(new ArtistScope());
+//		static::addGlobalScope(new ArtistScope());
 	}
 
 	public function city()
 	{
 		return $this->hasOne(City::class);
+	}
+
+	public function genres()
+	{
+		return $this->belongsToMany(Genre::class);
 	}
 
 	public function gigs()
@@ -108,5 +120,35 @@ class Artist extends Elegant
 		}
 
 		return $item;
+	}
+
+	public function scopeDetails($builder)
+	{
+		$user = Auth::user();
+		if ($user !== null)
+		{
+			$member = Member::where('user_id', $user->id)->first();
+			$builder = $builder->join('artist_members', function($join) use($member)
+			{
+				$join->on('artists.id', 'artist_id')->where('member_id', $member->id);
+			});
+		}
+
+		$builder->select()
+			->join('cities as c', 'c.id', 'city_id')
+			->join('states as st', 'st.id', 'c.state_id')
+//			->join('postalcodes as p', 'p.city_id', 'artists.city_id')
+			->join('countries as co', 'co.id', 'st.country_id')
+			->select([
+				'artists.*',
+//				'p.longitude',
+//				'p.latitude',
+//				'p.code as postal_code',
+				'c.name as city',
+				'st.name as state',
+				'co.name as country',
+				'co.sortname as sortname',
+				DB::raw("CONCAT(c.name,', ',st.name,', ',co.sortname) as location")
+			]);
 	}
 }

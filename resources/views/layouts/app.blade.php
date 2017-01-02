@@ -7,18 +7,19 @@
 
     <link rel="stylesheet" href="/css/all.css">
     <script type="text/javascript" href="/js/all.js"></script>
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css">
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.3.3/css/AdminLTE.min.css">
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.3.3/css/skins/_all-skins.min.css">
-    <link rel="stylesheet" href="http://raw.githubusercontent.com/hyspace/typeahead.js-bootstrap3.less/master/typeahead.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/select2.min.css">
+    <link rel="stylesheet" href="/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/css/_all-skins.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/typeahead.css">
 
     {{--<!-- Ionicons -->--}}
-    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript" src='http://maps.google.com/maps/api/js?libraries=places&key=AIzaSyDCFUSNaAg1mpT8S_GPO-36AmRLNxN7pG4'></script>
-    <script>/*! jquery-locationpicker - v0.1.12 - 2015-01-05 */
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src='https://maps.google.com/maps/api/js?libraries=places&key=AIzaSyDCFUSNaAg1mpT8S_GPO-36AmRLNxN7pG4'></script>
+    <script>
+        /*! jquery-locationpicker - v0.1.12 - 2015-01-05 */
         /*! jquery-locationpicker - v0.1.15 - 2016-09-26 */
         (function($) {
             function GMapContext(domElement, options) {
@@ -513,18 +514,17 @@
                     <span class="icon-bar"></span>
                 </button>
 
+                <div class="pull-left image">
                 <!-- Branding Image -->
                 <a class="navbar-brand" href="{!! url('/') !!}">
                     Gig Info
+                    <img src="/img/giginfo_logo.png" class="img-circle" style="display:inline;height: 30px"
+                         alt="User Image"/>
                 </a>
+                </div>
             </div>
 
             <div class="collapse navbar-collapse" id="app-navbar-collapse">
-                <!-- Left Side Of Navbar -->
-                <ul class="nav navbar-nav">
-                    <li><a href="{!! url('/home') !!}">Home</a></li>
-                </ul>
-
                 <!-- Right Side Of Navbar -->
                 <ul class="nav navbar-nav navbar-right">
                     <!-- Authentication Links -->
@@ -548,7 +548,7 @@
 
     <!-- jQuery 2.1.4 -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/iCheck/1.0.2/icheck.min.js"></script>
 

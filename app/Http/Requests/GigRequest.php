@@ -28,11 +28,11 @@ class GigRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
 	public function rules()
 	{
 		return [
-			'start'     => 'required',
+			'start'     => 'required|unique_with:gigs,name,@id,artist_id,@artist_id',
 			'finish'    => 'required',
 			'artist_id' => 'required|exists:artists,id',
 			'venue_id'  => 'required|exists:venues,id',
-			'name'      => 'required|unique_with:gigs,name,@id,artist_id,@artist_id'
+//			'name'      => 'required|unique_with:gigs,name,@id,artist_id,@artist_id'
 		];
 	}
 

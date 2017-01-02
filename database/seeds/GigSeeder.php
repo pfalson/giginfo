@@ -172,7 +172,7 @@ class GigSeeder extends Seeder
 		$address = urlencode($address);
 
 		// google map geocode api url
-		$url = "http://maps.google.com/maps/api/geocode/json?address={$address}";
+		$url = "https://maps.google.com/maps/api/geocode/json?address={$address}";
 
 		// get the json response
 		$resp_json = file_get_contents($url);

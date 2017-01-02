@@ -25,7 +25,7 @@
 <script src="/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <!--suppress JSUnresolvedLibraryURL -->
-<script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+<script src="https://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
 
 @yield("js-end-of-page")
 

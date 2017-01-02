@@ -44,7 +44,17 @@ class ArtistCrudController extends CrudController
 				]);
 		}
 
-		$attributes = 			[  // Select2
+		$this->crud->addField([       // SelectMultiple = n-n relationship (with pivot table)
+			'label'     => "Genres",
+			'type'      => 'select2_multiple',
+			'name'      => 'genres', // the method that defines the relationship in your Model
+			'entity'    => 'genres', // the method that defines the relationship in your Model
+			'attribute' => 'value', // foreign key attribute that is shown to user
+			'model'     => "App\Models\Genre", // foreign key model
+			'pivot'     => true, // on create&update, do you need to add/delete pivot table entries?
+		]);
+
+		$attributes = [  // Select2
 			'label'              => "City",
 			'placeholder'        => "Start typing to select a city",
 			'hint'               => "Enter the city name only then scroll to find a match",
@@ -67,7 +77,48 @@ class ArtistCrudController extends CrudController
 
 		$this->crud->addField($attributes);
 
+		if (ends_with($path, '/edit'))
+		{
+			$feed = 'https://giginfo.org/feed/gigs?artist=' . explode('/', $path)[3];
+			$this->crud->addField(
+				[
+					'name'              => 'rss',
+					'label'             => 'RSS Feed Links',
+					'type'              => 'heading',
+					'wrapperAttributes' => ['style' => "margin: 0"]
+				]
+			);
+			$this->crud->addField(
+				[
+					'name'       => 'currentEvent',
+					'label'      => 'Upcoming Gigs',
+					'type'       => 'text',
+					'value'      => $feed . '&when=future',
+					'attributes' => ['readonly' => 'readonly']
+				]
+			);
 
+			$this->crud->addField(
+				[
+					'name'       => 'previousEvent',
+					'label'      => 'Previous Gigs',
+					'type'       => 'text',
+					'value'      => $feed . '&when=past',
+					'attributes' => ['readonly' => 'readonly']
+				]
+			);
+
+			$this->crud->addField(
+				[
+					'name'       => 'eventPoster',
+					'label'      => 'Poster Link',
+					'type'       => 'text',
+					'value'      => 'https://giginfo.org/gigs/{id}/poster',
+					'attributes' => ['readonly' => 'readonly'],
+					'hint'       => 'Substitute the gig "id" value for "{id}'
+				]
+			);
+		}
 
 		// ------ CRUD FIELDS
 		// $this->crud->addField($options, 'update/create/both');
@@ -122,7 +173,7 @@ class ArtistCrudController extends CrudController
 		// $this->crud->enableExportButtons();
 
 		// ------ ADVANCED QUERIES
-		// $this->crud->addClause('active');
+		$this->crud->addClause('details');
 		// $this->crud->addClause('type', 'car');
 		// $this->crud->addClause('where', 'name', '==', 'car');
 		// $this->crud->addClause('whereName', 'car');

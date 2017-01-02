@@ -29,6 +29,7 @@ class VenueScope implements Scope
 			->join('cities as c', 'c.id', 'p.city_id')
 			->join('states as st', 'st.id', 'c.state_id')
 			->join('countries as co', 'co.id', 'st.country_id')
+			->join('timezones as t', 't.id', 'a.timezone_id')
 			->select([
 				'venues.*',
 				'a.street_number',
@@ -40,6 +41,7 @@ class VenueScope implements Scope
 				'st.name as state',
 				'co.name as country',
 				'co.sortname as sortname',
+				't.name as timeZone',
 				DB::raw("CONCAT(street_number,' ',s.name,' ',c.name,', ',st.name,', ',co.name) COLLATE utf8_bin as address"),
 				DB::raw("CONCAT(venues.name,' ',street_number,' ',s.name,', ',c.name,', ',st.name,', ',co.name) COLLATE utf8_bin as details")
 			]);

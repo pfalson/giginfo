@@ -15,6 +15,28 @@
 use Illuminate\Http\Request;
 use Roumen\Feed\Feed;
 
+Route::get('tzdetect', array('as' => 'tzdetect', function ()
+{
+	return view('gettz');
+}));
+
+Route::get('tzpostdetect', array('as' => 'tzpostdetect', function ()
+{
+	Session::put('tz', $_GET['_tz']);
+	Session::put('tz_done', 'done');
+	return Redirect::to(url(Session::pull('tz_route')));
+}));
+
+Route::get('gigs/test', function()
+{
+	return view('gigs.test')->with(['latitude' => 0, 'longitude' => 0]);
+});
+
+Route::get("gigs/ical", function() {
+	ob_start();
+	require(public_path("ical.php"));
+	return ob_get_clean();
+});
 
 Route::get('events', function()
 {
@@ -25,14 +47,8 @@ Route::get('/', function ()
 {
 	return view('welcome');
 });
-Route::get('getFeeds', function()
-{
-	$result = file_get_contents('http://giginfo.org/feed/shows?artist=1&when=past', 1);
-	return $result;
-});
 
-//Route::feeds();
-Route::get('feed/shows', function (Request $request)
+Route::get('feed/gigs', function (Request $request)
 {
 	// create new feed
 	/** @var Feed $feed */
@@ -50,9 +66,9 @@ Route::get('feed/shows', function (Request $request)
 		// creating rss feed with our most recent 20 posts
 		$posts = Gigs::getShows($request);
 		// set your feed's title, description, link, pubdate and language
-		$feed->title = 'Shows';
+		$feed->title = 'Gigs';
 		$feed->description = 'Gig data';
-		$feed->logo = 'http://giginfo.org/img/giginfo_logo.png';
+		$feed->logo = 'https://giginfo.org/img/giginfo_logo.png';
 		$feed->link = url('feed');
 		$feed->setDateFormat('datetime'); // 'datetime', 'timestamp' or 'carbon'
 		if (count($posts) > 0)
@@ -140,7 +156,6 @@ Route::resource('artistmember', 'ArtistMemberController');
 Route::resource('instrument', 'InstrumentController');
 Route::resource('memberinstrument', 'MemberInstrumentController');
 Route::resource('dropdowns', 'DropDownsController');
-Route::resource('gigs', 'GigController');
 Route::resource('postcodetype', 'PostCodeTypeController');
 
 //Route::get('/', function ()
@@ -190,7 +205,7 @@ Route::get('autocomplete', function ()
 
 Route::get('find/{table?}', 'SearchController@find');
 
-Route::resource('gigs', 'GigController');
+	Route::resource('gigs', 'GigController');
 
 //Route::get('mapdemo1', function()
 //{
@@ -208,6 +223,7 @@ Route::group(['middleware'=>'auth'], function()
 		CRUD::resource('gig', 'Admin\GigCrudController');
 		CRUD::resource('venue', 'Admin\VenueCrudController');
 		CRUD::resource('artist', 'Admin\ArtistCrudController');
+		CRUD::resource('genre', 'Admin\GenreCrudController');
 	});
 });
 

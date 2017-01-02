@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Genre;
+use Flash;
+use Request;
+
 class GenreController extends Controller {
 
   /**
@@ -11,7 +15,10 @@ class GenreController extends Controller {
    */
   public function index()
   {
-    
+	  $dropdowns = Genre::all();
+
+	  return view('dropdowns.index')
+		  ->with(['tableName' => 'Genres', 'table' => 'genre', 'dropdowns' => $dropdowns]);
   }
 
   /**
@@ -21,7 +28,8 @@ class GenreController extends Controller {
    */
   public function create()
   {
-    
+	  return view('dropdowns.create')
+		  ->with(['tableName' => 'Genres', 'table' => 'genre']);
   }
 
   /**
@@ -31,7 +39,13 @@ class GenreController extends Controller {
    */
   public function store()
   {
-    
+	  $input = Request::all();
+
+	  Genre::create($input);
+
+	  Flash::success('Genre saved successfully.');
+
+	  return redirect(route('genre.index'));
   }
 
   /**

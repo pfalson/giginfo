@@ -124,13 +124,13 @@ class AddressCrudController extends CrudController
 	{
 		$address = null;
 
-		if (isset($params['street'])
-			&& isset($params['postal_code'])
-			&& isset($params['longitude'])
-			&& isset($params['latitude'])
-			&& isset($params['city'])
-			&& isset($params['state'])
-			&& isset($params['sortname'])
+		if (!empty($params['street'])
+			&& !empty($params['postal_code'])
+			&& !empty($params['longitude'])
+			&& !empty($params['latitude'])
+			&& !empty($params['city'])
+			&& !empty($params['state'])
+			&& !empty($params['sortname'])
 		)
 		{
 			$country = Country::where(['sortname' => $params['sortname']])->first();
@@ -175,7 +175,7 @@ class AddressCrudController extends CrudController
 							'postalcode_id' => $postalcode->id
 						];
 
-						if (isset($params['street_number']))
+						if (!empty($params['street_number']))
 						{
 							$args['street_number'] = $params['street_number'];
 						}

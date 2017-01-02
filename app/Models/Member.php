@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Member wherePrimaryRole($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Member whereBiography($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Artist[] $artist
  */
 class Member extends Elegant {
 
@@ -34,4 +35,9 @@ class Member extends Elegant {
 	protected $dates = ['deleted_at'];
 
 	protected $fillable = ['user_id', 'primary_role', 'biography'];
+
+	public function artist()
+	{
+		return $this->belongsToMany(Artist::class, 'artist_members');
+	}
 }

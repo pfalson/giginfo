@@ -47,7 +47,7 @@ class RegisterController extends Controller
 	public static function createMember($user)
 	{
 		$memberRole = ArtistRole::whereCode('m')->first();
-		Member::create(['user_id' => $user->id, 'primary_role' => $memberRole->id]);
+		Member::firstOrCreate(['user_id' => $user->id, 'primary_role' => $memberRole->id]);
 	}
 
 	/**

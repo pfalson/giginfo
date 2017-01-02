@@ -77,7 +77,7 @@ class GigCrudController extends CrudController
 		|--------------------------------------------------------------------------
 		*/
 
-		$hasArtists = Artist::count() > 0;
+		$hasArtists = Artist::details()->count() > 0;
 
 		if ($hasArtists)
 		{
@@ -118,6 +118,7 @@ class GigCrudController extends CrudController
 
 			$this->crud->scripts = "
 		var map;
+		
 		function toggleRadio() {
 			var non_house = ['establishment_div', 'add_venue'];
 			var non_house_display = 'none';
@@ -155,7 +156,7 @@ class GigCrudController extends CrudController
                 break;
             case 'focus':
                 var cookie = getCookie('venue_added');
-                if (typeof cookie !== 'undefined'){
+                if (cookie.length > 0){
                     var venue = JSON.parse(decodeURIComponent(cookie));
                     $.removeCookie('venue_added', { path: '/' });
                     $('input[name=venue_id]').select2('data', {id: venue.id, text: venue.name}).trigger('change');
@@ -180,7 +181,7 @@ function getCookie(cname) {
     }
     return '';
 }
-		";
+";
 
 			$this->crud->addField(
 				[  // Select2
@@ -306,9 +307,16 @@ function getCookie(cname) {
 
 			$this->crud->addField(
 				[
+					'type' => 'hidden',
+					'name' => 'dateTimeOffset'
+					]
+			);
+
+			$this->crud->addField(
+				[
 					'label' => "Start",
 					'type'  => 'datetime_picker',
-					'name'  => 'start'
+					'name'  => 'start',
 				]);
 
 			$path = $this->request->getPathInfo();

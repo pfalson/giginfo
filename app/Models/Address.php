@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use App\Elegant;
+use App\Repositories\AddressRepository;
 use App\Scopes\AddressScope;
 use Backpack\CRUD\CrudTrait;
+use DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -30,10 +32,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property float $longitude
  * @property float $latitude
  * @property integer $postalcode_id
+ * @property integer $timezone_id
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Address whereLongitude($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Address whereLatitude($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Address wherePostalcodeId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Address whereTimezoneId($value)
  * @property-read \App\Models\PostalCode $postalcode
+ * @property-read \App\Models\Timezone $timezone
  */
 class Address extends Elegant
 {
@@ -45,7 +50,7 @@ class Address extends Elegant
 	use SoftDeletes;
 
 	protected $dates    = ['deleted_at'];
-	protected $fillable = array('street_number', 'street_id', 'longitude', 'latitude', 'postalcode_id');
+	protected $fillable = array('street_number', 'street_id', 'longitude', 'latitude', 'postalcode_id', 'timezone_id');
 
 	/**
 	 * The "booting" method of the model.
@@ -59,13 +64,68 @@ class Address extends Elegant
 		static::addGlobalScope(new AddressScope());
 	}
 
+	/**
+	 * @param array $attributes
+	 * @return array
+	 */
+	protected static function setTimeZone(array $attributes):array
+	{
+		$timezone = AddressRepository::createTimeZone($attributes['longitude'], $attributes['latitude']);
+		$attributes['timezone_id'] = $timezone->id;
+		return $attributes;
+	}
+
 	public function street()
 	{
-		return $this->hasOne(Street::class);
+		return $this->belongsTo(Street::class);
 	}
 
 	public function postalcode()
 	{
-		return $this->hasOne(PostalCode::class);
+		return $this->belongsTo(PostalCode::class);
+	}
+
+	public function timezone()
+	{
+		return $this->belongsTo(Timezone::class);
+	}
+
+	/**
+	 * @param array $options
+	 * @return bool
+	 */
+	public function save(array $options = [])
+	{
+		$attributes = self::setTimeZone($this->getAttributes());
+		$this->setRawAttributes($attributes);
+
+		// TODO update xref
+		$item = parent::save($options);
+
+		return $item;
+	}
+
+	/**
+	 * @param array $attributes
+	 * @return bool|Elegant
+	 */
+	public static function create(array $attributes = [])
+	{
+		DB::beginTransaction();
+
+		$attributes = self::setTimeZone($attributes);
+
+		$item = parent::create($attributes);
+
+		if ($item)
+		{
+			DB::commit();
+		}
+		else
+		{
+			DB::rollBack();
+		}
+
+		return $item;
 	}
 }

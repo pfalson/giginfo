@@ -5,14 +5,19 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Admin\AddressCrudController;
 use App\Http\Requests\CreateGigRequest;
 use App\Http\Requests\UpdateGigRequest;
+use App\Models\Artist;
+use App\Models\ArtistMember;
+use App\Models\VenueType;
 use App\Repositories\GigRepository;
 use Carbon\Carbon;
+use DB;
 use File;
 use Illuminate\Http\Request;
 use Flash;
 use Intervention\Image\Facades\Image;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
+use Session;
 
 class GigController extends AppBaseController
 {
@@ -32,19 +37,7 @@ class GigController extends AppBaseController
 	 */
 	public function index(Request $request)
 	{
-		$postalcode = AddressCrudController::getLocation($request);
-
-		$this->gigRepository->pushCriteria(new RequestCriteria($request));
-		$gigs = $this->gigRepository->orderBy('start')->all()
-			->where('start', '>=', Carbon::yesterday())
-			->where('finish', '>', Carbon::now())
-		;
-
-//		$gigs = Gig::where('start', Carbon::now()->toDateString());//->where('finish', '< > NOW()')->get();
-//		$gigs = $gigs->get();
-
-		return view('gigs.browse')
-			->with(['gigs' => $gigs, 'postalcode' => $postalcode]);
+		return $this->applyFilter($request);
 	}
 
 	/**
@@ -66,13 +59,7 @@ class GigController extends AppBaseController
 	 */
 	public function store(CreateGigRequest $request)
 	{
-		$input = $request->all();
-
-		$this->gigRepository->create($input);
-
-		Flash::success('Gig saved successfully.');
-
-		return redirect(route('gigs.index'));
+		return $this->applyFilter($request);
 	}
 
 	/**
@@ -82,7 +69,7 @@ class GigController extends AppBaseController
 	 *
 	 * @return Response
 	 */
-	public function show($id)
+	public function show($id, Request $request)
 	{
 		$gig = $this->gigRepository->findWithoutFail($id);
 
@@ -93,7 +80,9 @@ class GigController extends AppBaseController
 			return redirect(route('gigs.index'));
 		}
 
-		return view('gigs.show')->with('gig', $gig);
+		$current = AddressCrudController::getLocation($request);
+
+		return view('gigs.show')->with(compact('gig', 'current'));
 	}
 
 	/**
@@ -174,17 +163,6 @@ class GigController extends AppBaseController
 		return redirect(route('gigs.index'));
 	}
 
-	// not currently used
-	private function storePicture($request)
-	{
-		$fname = $request->file($request->poster);
-		$source = \Input::file('poster');
-		$img = Image::make($source);
-		Response::make($img->encode('jpeg'));
-
-		return $img;
-	}
-
 	public function poster($id)
 	{
 		$gig = $this->gigRepository->findWithoutFail($id);
@@ -199,7 +177,7 @@ class GigController extends AppBaseController
 		{
 			$path = public_path() . '/' . $gig->poster;
 
-			if(!File::exists($path)) abort(404);
+			if (!File::exists($path)) abort(404);
 
 			$file = File::get($path);
 			$type = File::mimeType($path);
@@ -209,5 +187,139 @@ class GigController extends AppBaseController
 		}
 
 		return $response;
+	}
+
+	public function ical($id)
+	{
+		$gig = $this->gigRepository->findWithoutFail($id);
+
+		if (empty($gig))
+		{
+			abort(404);
+		}
+
+		return view('ical')->with(compact('gig'));
+	}
+
+	protected function applyFilter(Request $request)
+	{
+		$timezone = Session::get('tz');
+
+		$filter = [];
+		foreach ($request->all() as $key => $value)
+		{
+			if (!empty($value))
+			{
+				$filter[$key] = $value;
+			}
+		}
+
+		$venue_type = array_get($filter, 'venue_type', 'all');
+		$latitude = array_get($filter, 'latitude', 0);
+		$longitude = array_get($filter, 'longitude', 0);
+
+		if (!isset($filter['venue_type']) && $longitude == 0)
+		{
+			return view('gigs.index');
+		}
+
+		$distance = array_get($filter, 'distance', 20);
+		$genre = array_get($filter, 'genre', []);
+		$artist = array_get($filter, 'artist', []);
+		$start = Carbon::yesterday();
+
+		$today = array_get($filter, 'today');
+
+		if (!$today)
+		{
+			$start = array_get($filter, 'fake_start', Carbon::yesterday()->toDateString());
+			$finish = array_get($filter, 'fake_finish');
+
+			$start = Carbon::parse($start);
+			if (!empty($finish))
+				$finish = Carbon::parse($finish);
+		}
+
+		$this->gigRepository->pushCriteria(new RequestCriteria($request));
+
+		$artists = Artist::details()->pluck('name', 'id')->toArray();
+
+		$gigs = $this->gigRepository->orderBy('start')->all()
+			->where('start', '>=', $start);
+//			->where('finish', '>', Carbon::now());
+
+		if ($latitude > 0)
+		{
+			$distansSQL = DB::select("SELECT id FROM (SELECT id, ( 6371 * acos( cos( radians("
+				. $latitude . ") ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians("
+				. $longitude . ") ) + sin( radians("
+				. $latitude . ") ) * sin( radians( latitude ) ) ) ) AS distance FROM addresses HAVING distance < "
+				. $distance . " ORDER BY distance) as distances");
+
+			$addressIDs = [];
+			foreach ($distansSQL as $obj)
+			{
+				$addressIDs[] = $obj->id;
+			}
+
+			$gigs = $gigs->whereIn('address_id', $addressIDs);
+		}
+
+		$artists = $gigs->pluck('artistName', 'artist_id');
+
+		if (!$today && !empty($finish))
+		{
+			$gigs = $gigs->where('start', '<=', $finish);
+		}
+
+		if ($venue_type !== 'all')
+		{
+			$venueType_id = VenueType::where('name', $venue_type)->pluck('id')[0];
+			$gigs = $gigs->where('venuetype_id', $venueType_id);
+		}
+
+		if (!empty($genre) && empty($artists))
+		{
+			$artist = ArtistMember::whereIn('genre_id', $genre)->pluck('artist_id')->toArray();
+		}
+
+		if (!empty($artist))
+		{
+			$gigs = $gigs->whereIn('artist_id', $artist);
+		}
+
+		$finish = array_get($filter, 'fake_finish', explode(' ', $gigs->last()['start'])[0]);
+		$finish = Carbon::parse($finish);
+
+		$todaysGigs = $gigs->where('finish', '<', Carbon::tomorrow());
+
+		$start = array_get($filter, 'fake_start');
+		$finish = array_get($filter, 'fake_finish', $finish);
+
+		$showFilterHidden = array_get($filter, 'showFilterHidden', 'none');
+		if ($today || ($todaysGigs->count() > 0 && $showFilterHidden == 'none'))
+		{
+			$gigs = $todaysGigs;
+			$today = true;
+		}
+
+		$showMapHidden = array_get($filter, 'showMapHidden', 'none');
+
+		return view('gigs.browse')
+			->with(compact(
+				'gigs',
+				'latitude',
+				'longitude',
+				'distance',
+				'genre',
+				'artist',
+				'artists',
+				'today',
+				'start',
+				'finish',
+				'venue_type',
+				'showFilterHidden',
+				'showMapHidden'
+			));
 	}
 }

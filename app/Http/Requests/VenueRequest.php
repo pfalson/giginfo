@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class VenueRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
 {
 	protected static $rules = [
+		'address_id' => 'required',
 		'name' => 'required|unique_with:venues,name,@id,address_id,@address_id'
 	];
 
@@ -74,6 +75,7 @@ class VenueRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
 	public function messages()
 	{
 		return [
+			'address_id.required' => 'Please ensure all the address fields are filled',
 			'name.unique_with' => '"@name@" has already been used for this address'
 		];
 	}

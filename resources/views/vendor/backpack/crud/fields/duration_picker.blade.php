@@ -41,11 +41,13 @@ $field_language = isset($field['duration_picker_options']['language']) ? $field[
     {{-- FIELD CSS - will be loaded in the after_styles section --}}
     @push('crud_fields_styles')
     <link rel="stylesheet" href="{{ asset('vendor/backpack/jquery-duration-picker/jquery.timepicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('vendor/backpack/jquery-duration-picker/lib/bootstrap-datepicker.css') }}" />
     @endpush
 
     {{-- FIELD JS - will be loaded in the after_scripts section --}}
     @push('crud_fields_scripts')
     <script src="{{ asset('vendor/backpack/jquery-duration-picker/jquery.timepicker.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('vendor/backpack/jquery-duration-picker/lib/bootstrap-datepicker.js') }}"></script>
     <script>
         jQuery(document).ready(function ($) {
             $('[data-bs-durationpicker]').each(function () {
@@ -60,9 +62,8 @@ $field_language = isset($field['duration_picker_options']['language']) ? $field[
                 delete($customConfig['language']);
                 var start = $('#start_' + $field[0].name).val();
                 $picker = $fake.timepicker({
-                    'minTime': new Date(start),
-                    'showDuration': true,
-                    'show2400': true
+                    'minTime': new Date().toTimeString().split(" ")[0],
+                    'showDuration': true
                 });
                 $fake.timepicker('setTime', new Date($field.val()));
 //                $(this).durationPicker({

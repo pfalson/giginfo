@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use App\Elegant;
+use App\Repositories\AddressRepository;
 use App\Scopes\VenueScope;
 use Backpack\CRUD\CrudTrait;
+use DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Sofa\Eloquence\Subquery;
 use Venturecraft\Revisionable\RevisionableTrait;
 
 /**
@@ -38,6 +41,8 @@ use Venturecraft\Revisionable\RevisionableTrait;
  * @property integer $venuetype_id
  * @property-read \App\Models\VenueType $venuetype
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Venue whereVenuetypeId($value)
+ * @property-read mixed $details
+ * @property-read mixed $timezone
  */
 class Venue extends Elegant
 {
@@ -51,7 +56,7 @@ class Venue extends Elegant
 	const UPDATED_AT = 'updated_at';
 
 
-	protected $dates = ['deleted_at'];
+	protected $dates   = ['deleted_at'];
 	protected $appends = ['details'];
 
 	public $fillable = [
@@ -115,5 +120,16 @@ class Venue extends Elegant
 	public function gigs()
 	{
 		return $this->hasMany(Gig::class);
+	}
+
+	public function getDetailsAttribute()
+	{
+		return array_get($this->getAttributes(), 'details');
+	}
+
+
+	public function getTimezoneAttribute()
+	{
+		return array_get($this->getAttributes(), 'timeZone');
 	}
 }
