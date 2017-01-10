@@ -2,9 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Address;
+use App\Models\Address;
 use App\Models\Timezone;
+use DB;
 use Exception;
+use Illuminate\Support\Facades\Input;
 use InfyOm\Generator\Common\BaseRepository;
 use Session;
 use stdClass;
@@ -55,5 +57,27 @@ class AddressRepository extends BaseRepository
 		]);
 
 		return $timezone;
+	}
+
+	public static function getCityFromPosition()
+	{
+		$latitude = Input::get('latitude');
+		$longitude = Input::get('longitude');
+		$distance = Input::get('distance') ?? 50;
+		$distanceSQL = DB::select("SELECT id FROM (SELECT id, ( 6371 * acos( cos( radians("
+			. $latitude . ") ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians("
+			. $longitude . ") ) + sin( radians("
+			. $latitude . ") ) * sin( radians( latitude ) ) ) ) AS distance FROM addresses HAVING distance < "
+			. $distance . " ORDER BY distance LIMIT 1) as distances");
+
+		$result = [];
+
+		foreach ($distanceSQL as $address)
+		{
+			$city = Address::with('postalcode.city')->where('addresses.id', $address->id)->first();
+			$result = $city->postalcode->city;
+		}
+
+		return $result;
 	}
 }

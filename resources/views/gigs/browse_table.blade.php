@@ -59,20 +59,13 @@
     }
     ?>
     @foreach($gigs as $gig)
-        <?php
-        if (array_search($gig->artist_id, $artists) !== false)
-        {
-            $l = $editLink;
-            $w = $editWord;
-        }
-        else
-        {
-            $l = $link;
-            $w = $word;
-        }
-        ?>
         <tr>
-            <td><a href="{{ sprintf($l, $gig->id) }}">{{ $w }}</a></td>
+            <td>
+                <a href="{{ sprintf($link, $gig->id) }}">{{ $word }}</a>
+                @if (array_search($gig->artist_id, $artists) !== false)
+                    <a href="{{ sprintf($editLink, $gig->id) }}">{{ $editWord }}</a>
+                @endif
+            </td>
             <td>{!! $gig->artistName !!}</td>
             <td>{!! $gig->venueName !!}</td>
             <td>{!! date('d M Y', strtotime($gig->start)) !!}</td>

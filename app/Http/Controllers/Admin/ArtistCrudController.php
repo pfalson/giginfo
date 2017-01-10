@@ -69,17 +69,11 @@ class ArtistCrudController extends CrudController
 
 		$path = $this->request->getPathInfo();
 
-		if (ends_with($path, '/create'))
-		{
-			$postalcode = AddressCrudController::getLocation($this->request);
-			$attributes['value'] = $postalcode->city_id;
-		}
-
 		$this->crud->addField($attributes);
 
 		if (ends_with($path, '/edit'))
 		{
-			$feed = 'https://giginfo.org/feed/gigs?artist=' . explode('/', $path)[3];
+			$feed = url('feed/gigs?artist=' . explode('/', $path)[3]);
 			$this->crud->addField(
 				[
 					'name'              => 'rss',
@@ -113,11 +107,84 @@ class ArtistCrudController extends CrudController
 					'name'       => 'eventPoster',
 					'label'      => 'Poster Link',
 					'type'       => 'text',
-					'value'      => 'https://giginfo.org/gigs/{id}/poster',
+					'value'      => url('gigs/{id}/poster'),
 					'attributes' => ['readonly' => 'readonly'],
 					'hint'       => 'Substitute the gig "id" value for "{id}'
 				]
 			);
+		}
+
+		if (ends_with($path, '/create'))
+		{
+			$this->crud->addField(
+				[
+					'name'  => 'city_name',
+					'label' => '',
+					'type'  => 'hidden'
+				]
+			);
+
+			$this->crud->addField(
+				[
+					'name'  => 'state_name',
+					'label' => '',
+					'type'  => 'hidden'
+				]
+			);
+
+			$this->crud->addField(
+				[
+					'name'  => 'latitude',
+					'label' => '',
+					'type'  => 'hidden'
+				]
+			);
+
+			$this->crud->addField(
+				[
+					'name'  => 'longitude',
+					'label' => '',
+					'type'  => 'hidden'
+				]
+			);
+
+			$this->crud->addField(
+				[
+					'name'  => 'currentLocation',
+					'label' => '',
+					'type'  => 'hidden',
+					'attributes' => ['id' => 'currentLocation']
+				]
+			);
+
+			$this->crud->scripts = "
+        </script>
+        <script src='/js/getLocation.js'>
+        </script>
+        <script>
+        var latitude = $('#latitude');
+
+        geoFindMe(true);
+
+        latitude.change(function () {
+            if (latitude.val() !== '') {
+                currentLocation = $('#currentLocation');
+                if (currentLocation.val().startsWith('Unable')) {
+                    alert(currentLocation.val());
+                }
+                $('#form').submit();
+            }
+        });
+
+        var city_name = $('input[name=city_name]');
+        city_name.change(function () {
+            if (city_name.val() !== '') {
+                var city_id = $('input[name=city_id]');
+                var state_name = $('input[name=state_name]');
+                city_id.select2('data', {id: city_id.val(), text: city_name.val() + ', ' + state_name.val()}).trigger('change');
+            }
+        });
+";
 		}
 
 		// ------ CRUD FIELDS

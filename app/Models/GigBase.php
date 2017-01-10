@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Elegant;
-use App\Repositories\AddressRepository;
 use App\Scopes\GigScope;
 use Backpack\CRUD\CrudTrait;
 use Carbon\Carbon;
@@ -12,7 +11,7 @@ use File;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Image;
 use Log;
-use Request;
+use Illuminate\Http\Request;
 use Response;
 use Storage;
 
@@ -72,8 +71,6 @@ class GigBase extends Elegant
 
 	const CREATED_AT = 'created_at';
 	const UPDATED_AT = 'updated_at';
-
-	private $timeZoneId;
 
 	protected $dates = ['deleted_at'];
 
@@ -234,8 +231,9 @@ class GigBase extends Elegant
 	public function getShows(Request $request)
 	{
 		$artist_id = $request->input('artist');
-		$when = $request->input('when');
-		$builder = Gig::where(compact('artist_id'));
+		$when = $request->input('when') ?? $request->input('type');
+		$pagelimit = $request->input('pagelimit');
+		$builder = Gig::where('gigs.artist_id', $artist_id);
 
 		$now = Carbon::now();
 		$direction = 'asc';
@@ -249,6 +247,17 @@ class GigBase extends Elegant
 				$builder = $builder->where('start', '<', $now);
 				$direction = 'desc';
 				break;
+		}
+
+		if ($pagelimit)
+		{
+			$get = 'paginate';
+			$arg = $pagelimit;
+		}
+		else
+		{
+			$get = 'get';
+			$arg = null;
 		}
 
 		return $builder
@@ -268,39 +277,35 @@ class GigBase extends Elegant
 				'countries.sortname as countryCode',
 				'ageValue'
 			)->orderBy('start', $direction)
-			->get();
+			->$get($arg);
 	}
 
 	protected function convertFromUTC($attribute, $timeZone = null)
 	{
 		$timeZone = $timeZone ?? $this->venue->timeZone;
 		$value = $this->attributes[$attribute];
-		$attribute .= 'Timezone';
-
-		if ($timeZone != $this->$attribute)
-		{
-			$value = Carbon::parse($value)->setTimezone($timeZone)->toDateTimeString();
-		}
+		$value = Carbon::parse($value)->setTimezone($timeZone)->toDateTimeString();
 
 		return $value;
 	}
 
+	public function save(array $options = [])
+	{
+		$start = Carbon::parse($this->attributes['start'], $this->venue->timeZone)->setTimezone('UTC');
+		$finish = Carbon::parse($this->attributes['finish'], $this->venue->timeZone)->setTimezone('UTC');
+		$this->setAttribute('start', $start);
+		$this->setAttribute('finish', $finish);
+		return parent::save($options);
+	}
+
 	/**
-	 * @param $value
-	 * @param bool $getTz
+	 * @param string $value
+	 * @param string $tz
 	 * @return string
 	 */
-	protected function offsetTime($value, $getTz = true)
+	protected function offsetTime($value, $tz)
 	{
-		if ($getTz)
-		{
-			$venue_id = Request::get('venue_id');
-			$venue = Venue::where('venues.id', $venue_id)->first();
-
-			$this->timeZoneId = $venue->timezone;
-		}
-
-		$carbon = Carbon::parse($value, $this->timeZoneId)->setTimeZone('UTC');
+		$carbon = Carbon::parse($value, $tz)->setTimeZone('UTC');
 		return $carbon->toDateTimeString();
 	}
 }

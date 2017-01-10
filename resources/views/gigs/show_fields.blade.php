@@ -15,9 +15,9 @@
     {!! Form::label('date', 'When:&nbsp;&nbsp;') !!}
     {!! date('dS M Y', strtotime($gig->start)) !!}
     {!! Form::label('from', '&nbsp;&nbsp;from&nbsp;&nbsp;') !!}
-    {!! date('h:ia', strtotime($gig->start)) !!}
+    {!! date('g:ia', strtotime($gig->start)) !!}
     {!! Form::label('to', '&nbsp;&nbsp;to&nbsp;&nbsp;') !!}
-    {!! date('h:ia', strtotime($gig->finish)) !!}
+    {!! date('g:ia', strtotime($gig->finish)) !!}
 </div>
 
 
@@ -51,7 +51,7 @@
 <!-- Poster Field -->
 @if ($gig->poster)
     <div class="form-group">
-        <img src="https://giginfo.org/gigs/{{ $gig->id }}/poster" style="width: 100px; height: 150px;" />
+        <img src="/gigs/{{ $gig->id }}/poster" style="width: 100px; height: 150px;" />
     </div>
 @endif
 <div><p></p></div>

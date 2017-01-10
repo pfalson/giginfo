@@ -7,6 +7,7 @@ use InfyOm\Generator\Common\BaseRepository;
 
 class GigRepository extends BaseRepository
 {
+	const defaultDistance = 100; // (km)
     /**
      * @var array
      */

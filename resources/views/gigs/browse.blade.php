@@ -3,8 +3,8 @@
 @section('content')
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet"></link>
-    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" rel="stylesheet"></link>
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" rel="stylesheet">
     <script src="../vendor/adminlte/plugins/datepicker/bootstrap-datepicker.js"></script>
     <script type="text/javascript"
             src="../vendor/adminlte/plugins/daterangepicker/moment.min.js"></script>
@@ -42,7 +42,6 @@
 // arrays to hold variants of the info window html with get direction forms open
             var to_htmls = [];
             var from_htmls = [];
-            var i = locations.length;
 
             var location = new google.maps.LatLng({{ $latitude }}, {{ $longitude }});
             latlng = location;
@@ -57,12 +56,13 @@
             var infowindow = new google.maps.InfoWindow();
 
             var marker, i;
+            var base_path = '{{ url('/gigs')  }}';
 
             for (i = 0; i < locations.length; i++) {
                 marker = new google.maps.Marker({
                     position: new google.maps.LatLng(locations[i][1], locations[i][2]),
                     map: map,
-                    url: 'https://giginfo.org/gigs/' + locations[i][3]
+                    url: base_path + '/' + locations[i][3]
                 });
 
                 google.maps.event.addListener(marker, 'mouseover', (function (marker, i) {
@@ -116,7 +116,6 @@
         <p></p>
         <div id="content" class="content" style="display: {{ $showFilterHidden }}">
             @include('flash::message')
-
             <div class="clearfix"></div>
             <div class="clearfix"></div>
             <p></p>
@@ -182,7 +181,7 @@
                 </label>
             </div>
             <div style="margin: 10px 0px 10px 0px;">
-                {!! Form::label('distance', 'Distance:') !!}
+                {!! Form::label('distance', 'Distance (km):') !!}
                 <input type="number" name="distance" id="distance"
                        value="{{{ $distance }}}" style="width: 60px; margin-bottom: 5px;"/>
             </div>
@@ -203,6 +202,9 @@
             <div id="showMap">{{ $showMapHidden == 'none' ? 'Show' : 'Hide' }} Map</div>
         </div>
         <p></p>
+        <div id="div_showDistance" style="display: {{ $showFilterHidden == 'none' ? 'block' : 'none' }}">
+            Within {{ $distance }} km
+        </div>
         <div class="box box-primary">
             <div class="box-body">
                 <div id="map" style="width: 100%; height: 400px; display: {{ $showMapHidden }};">
@@ -220,14 +222,17 @@
     <script>
         var mapDrawn = false;
         var showFilterBtn = $('#showFilter');
+        var showDistance = $('#div_showDistance');
         var showFilterHidden = $('#showFilterHidden');
         showFilterBtn.click(function () {
             var filterDiv = $('#content');
             if (showFilterBtn.text() === 'Show Filter') {
                 filterDiv.show();
+                showDistance.hide();
                 showFilterBtn.text('Hide Filter');
             } else {
                 filterDiv.hide();
+                showDistance.show();
                 showFilterBtn.text('Show Filter');
             }
             showFilterHidden.val(filterDiv.css('display'));
@@ -251,9 +256,9 @@
             showMap();
         }
     </script>
-    <script src="https://giginfo.org/vendor/adminlte/plugins/datepicker/bootstrap-datepicker.js"></script>
+    <script src="../vendor/adminlte/plugins/datepicker/bootstrap-datepicker.js"></script>
     <script type="text/javascript"
-            src="https://giginfo.org/vendor/adminlte/plugins/daterangepicker/moment.min.js"></script>
+            src="../vendor/adminlte/plugins/daterangepicker/moment.min.js"></script>
     <script type="text/javascript"
             src="https://cdn.jsdelivr.net/bootstrap.datetimepicker/4.17.42/js/bootstrap-datetimepicker.min.js"></script>
     <script>

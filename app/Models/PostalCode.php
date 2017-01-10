@@ -44,4 +44,8 @@ class PostalCode extends Elegant
 	protected $dates    = ['deleted_at'];
 	protected $fillable = array('code', 'postallocation_id', 'longitude', 'latitude', 'locationtype_id', 'postcodetype_id', 'city_id');
 
+	public function city()
+	{
+		return $this->belongsTo(City::class);
+	}
 }

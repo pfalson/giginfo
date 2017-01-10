@@ -15,6 +15,7 @@
     <label>{!! $field['label'] !!}</label>
     <div class="input-group date">
         <input
+            name="fake_{{ $field['name'] }}"
             data-bs-datepicker="{{ isset($field['date_picker_options']) ? json_encode($field['date_picker_options']) : '{}'}}"
             type="text"
             @include('crud::inc.field_attributes')
@@ -55,13 +56,16 @@
                 var $fake = $(this),
                 $field = $fake.parents('.form-group').find('input[type="hidden"]'),
                 $customConfig = $.extend({
-                    format: 'dd/mm/yyyy'
+                    format: 'yyyy-mm-dd'
                 }, $fake.data('bs-datepicker'));
                 $picker = $fake.datepicker($customConfig);
 
                 var $existingVal = $field.val();
 
                 if( $existingVal.length ){
+                    if ($existingVal.indexOf(':') === -1) {
+                        $existingVal += ' 00:00:00';
+                    }
                     preparedDate = new Date($existingVal).format($customConfig.format);
                     $fake.val(preparedDate);
                     $picker.datepicker('update', preparedDate);
@@ -79,7 +83,7 @@
                          try {
                              var sqlDate = $fake.val();
 
-                             if( $customConfig.format === 'dd/mm/yyyy' ){
+                             if(sqlDate.length > 0 && $customConfig.format === 'dd/mm/yyyy' ){
                                  sqlDate = new Date(sqlDate.split('/')[2], sqlDate.split('/')[1] - 1, sqlDate.split('/')[0]).format('yyyy-mm-dd');
                              }
                          } catch(e){
@@ -92,7 +96,7 @@
                             });
                          }
                      }
-                     $field.val(sqlDate);
+                     $field.val(sqlDate).trigger('change');
                 });
 
             });

@@ -18,6 +18,7 @@ use Intervention\Image\Facades\Image;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
 use Session;
+use View;
 
 class GigController extends AppBaseController
 {
@@ -55,7 +56,7 @@ class GigController extends AppBaseController
 	 *
 	 * @param CreateGigRequest $request
 	 *
-	 * @return Response
+	 * @return View
 	 */
 	public function store(CreateGigRequest $request)
 	{
@@ -67,9 +68,9 @@ class GigController extends AppBaseController
 	 *
 	 * @param  int $id
 	 *
-	 * @return Response
+	 * @return View
 	 */
-	public function show($id, Request $request)
+	public function show($id, \Request $request)
 	{
 		$gig = $this->gigRepository->findWithoutFail($id);
 
@@ -201,6 +202,10 @@ class GigController extends AppBaseController
 		return view('ical')->with(compact('gig'));
 	}
 
+	/**
+	 * @param Request $request
+	 * @return View
+	 */
 	protected function applyFilter(Request $request)
 	{
 		$timezone = Session::get('tz');
@@ -220,10 +225,10 @@ class GigController extends AppBaseController
 
 		if (!isset($filter['venue_type']) && $longitude == 0)
 		{
-			return view('gigs.index');
+			return view('gigs.index')->with('distance', GigRepository::defaultDistance);
 		}
 
-		$distance = array_get($filter, 'distance', 20);
+		$distance = array_get($filter, 'distance');
 		$genre = array_get($filter, 'genre', []);
 		$artist = array_get($filter, 'artist', []);
 		$start = Carbon::yesterday();
@@ -250,14 +255,14 @@ class GigController extends AppBaseController
 
 		if ($latitude > 0)
 		{
-			$distansSQL = DB::select("SELECT id FROM (SELECT id, ( 6371 * acos( cos( radians("
+			$distanceSQL = DB::select("SELECT id FROM (SELECT id, ( 6371 * acos( cos( radians("
 				. $latitude . ") ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians("
 				. $longitude . ") ) + sin( radians("
 				. $latitude . ") ) * sin( radians( latitude ) ) ) ) AS distance FROM addresses HAVING distance < "
 				. $distance . " ORDER BY distance) as distances");
 
 			$addressIDs = [];
-			foreach ($distansSQL as $obj)
+			foreach ($distanceSQL as $obj)
 			{
 				$addressIDs[] = $obj->id;
 			}

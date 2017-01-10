@@ -68,10 +68,28 @@ class GigRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
 		/** @var ParameterBag $requestParams */
 		$requestParams = $this->request;
 		$attributes = $requestParams->all();
-
-		if (!empty($attributes['finish']))
+		if (!empty($attributes['when']) && !empty($attributes['starttime']))
 		{
-			$modifiedAttributes['finish'] = Carbon::parse($attributes['start'])->modify($attributes['finish'])->toDateTimeString();
+			$venue = Venue::where('venues.id', $attributes['venue_id'])->first();
+			$start = $attributes['when'] . ' ' . $attributes['starttime'];
+
+			if (!empty($attributes['finish']))
+			{
+				$finish = $attributes['finish'];
+				if (strstr($finish, '-') === false)
+				{
+					$finish = $attributes['when'] . ' ' . $finish;
+				}
+
+				$starttime = Carbon::parse($start, $venue->timezone);
+				$finishtime = Carbon::parse($finish, $venue->timezone);
+				if ($finishtime->lt($starttime))
+				{
+					$finishtime->addDay(1);
+				}
+				$modifiedAttributes['start'] = $starttime->toDateTimeString();
+				$modifiedAttributes['finish'] = $finishtime->toDateTimeString();
+			}
 		}
 
 		if ($requestParams->get('venuetype') === '2')

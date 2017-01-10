@@ -12,6 +12,7 @@
 */
 //Route::feeds();
 
+use App\Repositories\AddressRepository;
 use Illuminate\Http\Request;
 use Roumen\Feed\Feed;
 
@@ -26,6 +27,18 @@ Route::get('tzpostdetect', array('as' => 'tzpostdetect', function ()
 	Session::put('tz_done', 'done');
 	return Redirect::to(url(Session::pull('tz_route')));
 }));
+
+Route::get('getLocation', array('as' => 'getLocation', function (Request $request)
+{
+	return Response::json(unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip=' . $request->ip())));
+}));
+
+Route::get('getCityFromPosition', array('as' => 'getCityFromPosition', function ()
+{
+	return AddressRepository::getCityFromPosition();
+}));
+
+Route::get('iframeGigs', 'IFrameController@gigs');
 
 Route::get('gigs/test', function()
 {
@@ -68,7 +81,7 @@ Route::get('feed/gigs', function (Request $request)
 		// set your feed's title, description, link, pubdate and language
 		$feed->title = 'Gigs';
 		$feed->description = 'Gig data';
-		$feed->logo = 'https://giginfo.org/img/giginfo_logo.png';
+		$feed->logo = url('img/giginfo_logo.png');
 		$feed->link = url('feed');
 		$feed->setDateFormat('datetime'); // 'datetime', 'timestamp' or 'carbon'
 		if (count($posts) > 0)
@@ -141,6 +154,7 @@ Route::get('feed/gigs', function (Request $request)
 //});
 
 Route::resource('genre', 'GenreController');
+Route::resource('templatetype', 'TemplateTypeController');
 Route::resource('artist', 'ArtistController');
 Route::resource('venue', 'VenueController');
 Route::resource('member', 'MemberController');
@@ -205,12 +219,7 @@ Route::get('autocomplete', function ()
 
 Route::get('find/{table?}', 'SearchController@find');
 
-	Route::resource('gigs', 'GigController');
-
-//Route::get('mapdemo1', function()
-//{
-//	return view('venues.mapdemo1');
-//});
+Route::resource('gigs', 'GigController');
 
 Route::get('gigs/{id}/poster', 'GigController@poster');
 Route::get('manage-gigs', 'Crud\GigController@manageCrud');
@@ -224,6 +233,8 @@ Route::group(['middleware'=>'auth'], function()
 		CRUD::resource('venue', 'Admin\VenueCrudController');
 		CRUD::resource('artist', 'Admin\ArtistCrudController');
 		CRUD::resource('genre', 'Admin\GenreCrudController');
+		CRUD::resource('artist_template_type', 'Admin\ArtistTemplateTypeCrudController');
+		CRUD::resource('artist_template', 'Admin\ArtistTemplateCrudController');
 	});
 });
 

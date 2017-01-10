@@ -25,6 +25,7 @@ $field_language = isset($field['duration_picker_options']['language']) ? $field[
                 type="text"
                 @include('crud::inc.field_attributes')
         >
+        <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
     </div>
 
     {{-- HINT --}}
@@ -61,8 +62,13 @@ $field_language = isset($field['duration_picker_options']['language']) ? $field[
                 $customConfig.locale = $customConfig['language'];
                 delete($customConfig['language']);
                 var start = $('#start_' + $field[0].name).val();
+                if (typeof start !== 'undefined' && start.indexOf(' ') !== -1) {
+                    start = start.split(" ")[1];
+                } else {
+                    start = null;
+                }
                 $picker = $fake.timepicker({
-                    'minTime': new Date().toTimeString().split(" ")[0],
+                    'minTime': start,
                     'showDuration': true
                 });
                 $fake.timepicker('setTime', new Date($field.val()));
@@ -86,7 +92,7 @@ $field_language = isset($field['duration_picker_options']['language']) ? $field[
                 });
 
                 $picker.on('change', function (e) {
-                    $field.val($fake.val());
+                    $field.val($fake.val()).trigger('change');
                 });
             });
         });

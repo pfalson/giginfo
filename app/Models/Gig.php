@@ -55,26 +55,28 @@ class Gig extends GigBase
 
 	use SoftDeletes;
 
-	private $startTimezone;
-	private $finishTimezone;
-
 	public function getStartAttribute()
 	{
 		return $this->convertFromUTC('start');
 	}
 
-	public function setStartAttribute($value)
+	public function getWhenAttribute()
 	{
-		$this->attributes['start'] = $this->offsetTime($value);
+		return explode(' ', $this->start)[0];
+	}
+
+	public function getStarttimeAttribute()
+	{
+		return explode(' ', $this->start)[1];
+	}
+
+	public function getFinishtimeAttribute()
+	{
+		return explode(' ', $this->finish)[1];
 	}
 
 	public function getFinishAttribute()
 	{
 		return $this->convertFromUTC('finish');
-	}
-
-	public function setFinishAttribute($value)
-	{
-		$this->attributes['finish'] = $this->offsetTime($value, false);
 	}
 }

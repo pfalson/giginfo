@@ -56,7 +56,7 @@ class SearchController extends Controller
 			$builder = $builder->autocomplete();
 		}
 
-		$builder =  DB::table(DB::raw("({$builder->toSql()}) as " . $table))
+		$builder = DB::table(DB::raw("({$builder->toSql()}) as " . $table))
 			->mergeBindings($builder->getQuery());// you need to get underlying Query Builder
 
 
@@ -68,9 +68,9 @@ class SearchController extends Controller
 					->orWhereRaw('replace(' . $column . ', "\'", "") LIKE "%' . trim($value, "'") . '%"');
 			}
 		}
-
+$collate = ''; //, $collate = ' COLLATE utf8_bin ASC'
 		$results = $builder
-			->orderByRaw($column. ' COLLATE utf8_bin ASC')
+			->orderByRaw($column . $collate)
 			->paginate();
 
 		return Response::json($results);

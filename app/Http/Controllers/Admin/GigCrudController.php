@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Artist;
+use App\Models\UserArtist;
 use Auth;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 
@@ -30,8 +30,17 @@ class GigCrudController extends CrudController
 		$user = Auth::user();
 		if ($user !== null)
 		{
-			$addArtist = Artist::count() > 1;
+			$addArtist = UserArtist::count() > 1;
 		}
+
+		$this->crud->addColumn(
+			[
+				'name'   => 'start',
+				'label'  => 'When',
+				'type'   => 'datetime',
+				'format' => 'D h:ia-j M y'
+			]
+		);
 
 		if ($addArtist)
 		{
@@ -56,15 +65,6 @@ class GigCrudController extends CrudController
 
 		$this->crud->addColumn(
 			[
-				'name'   => 'start',
-				'label'  => 'When',
-				'type'   => 'datetime',
-				'format' => 'D h:ia-j M y'
-			]
-		);
-
-		$this->crud->addColumn(
-			[
 				'name'  => 'name',
 				'label' => 'Name',
 				'type'  => 'text'
@@ -77,7 +77,7 @@ class GigCrudController extends CrudController
 		|--------------------------------------------------------------------------
 		*/
 
-		$hasArtists = Artist::details()->count() > 0;
+		$hasArtists = UserArtist::count() > 0;
 
 		if ($hasArtists)
 		{
@@ -88,7 +88,7 @@ class GigCrudController extends CrudController
 					'name'      => 'artist_id', // the db column for the foreign key
 					'entity'    => 'artists', // the method that defines the relationship in your Model
 					'attribute' => 'name', // foreign key attribute that is shown to user
-					'model'     => "App\Models\Artist" // foreign key model
+					'model'     => "App\Models\UserArtist" // foreign key model
 				]);
 
 			$this->crud->addField(
@@ -137,14 +137,17 @@ class GigCrudController extends CrudController
             }
 		}
 		toggleRadio();
-		$(function(){
-		    var start = $('#start');
-
-    start.on('change', function(){ //bind() for older jquery version
-		    var time = $(this).val().split(' ');
-			$('[name=fake_finish]').timepicker('setMinTime', time[time.length-1]);
-            $('#finish_div').show();
-    }); //could be change() or trigger('change')
+		var fake_starttime = $('input[name=fake_starttime]');
+		var starttime = $('input[name=starttime]');
+		$('input[name=when]').bind('change', function() {
+		    if (fake_starttime.val().length == 0) {
+		        fake_starttime.val('08:00 pm').trigger('change');
+		    }
+		});
+		starttime.bind('change', function() {
+			var fake = $('[name=fake_finish]');
+			fake.timepicker('setMinTime', $(this).val());
+            fake.attr('readonly', false);
 		});
 		$(window).on('blur focus', function(e) {
     var prevType = $(this).data('prevType');
@@ -309,28 +312,38 @@ function getCookie(cname) {
 				[
 					'type' => 'hidden',
 					'name' => 'dateTimeOffset'
-					]
+				]
 			);
 
 			$this->crud->addField(
 				[
-					'label' => "Start",
-					'type'  => 'datetime_picker',
-					'name'  => 'start',
+					'label'             => "When",
+					'type'              => 'date_picker',
+					'name'              => 'when',
+					'wrapperAttributes' => ['class' => 'form-group col-md-4']
 				]);
+
+			$this->crud->addField(
+				[
+					'label'             => "Start",
+					'type'              => 'time_picker',
+					'name'              => 'starttime',
+					'wrapperAttributes' => ['class' => 'form-group col-md-4']
+				]);
+
+			$attributes = [
+				'label'             => "Finish",
+				'type'              => 'duration_picker',
+				'name'              => 'finish',
+				'start'             => 'start',
+				'wrapperAttributes' => ['class' => 'form-group col-md-4']
+			];
 
 			$path = $this->request->getPathInfo();
 
-			$attributes = [
-				'label' => "Finish",
-				'type'  => 'duration_picker',
-				'name'  => 'finish',
-				'start' => 'start'
-			];
-
 			if (ends_with($path, '/create'))
 			{
-				$attributes['wrapperAttributes'] = ['id' => 'finish_div', 'style' => 'display: none'];
+				$attributes['attributes'] = ['readonly' => true];
 			}
 
 			$this->crud->addField($attributes);
