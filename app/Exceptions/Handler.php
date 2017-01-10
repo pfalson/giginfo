@@ -2,10 +2,14 @@
 
 namespace App\Exceptions;
 
+use App\Mail\EmailError;
+use Config;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Session\TokenMismatchException;
 use Log;
+use Mail;
 
 class Handler extends ExceptionHandler
 {
@@ -39,6 +43,24 @@ class Handler extends ExceptionHandler
 	    // Don't report VerifyCSRFToken mismatch if the cookies were removed
 	    if ($this->notMissingToken($e))
 	    {
+		    if ($e instanceof \Exception) {
+			    $debugSetting = Config::get('app.debug');
+
+			    Config::set('app.debug', true);
+			    if (ExceptionHandler::isHttpException($e)) {
+				    $content = ExceptionHandler::toIlluminateResponse(ExceptionHandler::renderHttpException($e), $e);
+			    } else {
+				    $content = ExceptionHandler::toIlluminateResponse(ExceptionHandler::convertExceptionToResponse($e), $e);
+			    }
+
+			    Config::set('app.debug', $debugSetting);
+
+			    $data = (!isset($content->original)) ? $e->getMessage() : $content->original;
+
+			    Mail::to('contact@giginfo.org')
+				    ->send(new EmailError($data));
+		    }
+
 		    parent::report($e);
 	    }
     }

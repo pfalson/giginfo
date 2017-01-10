@@ -44,7 +44,7 @@ class GigController extends AppBaseController
 	/**
 	 * Show the form for creating a new Gig.
 	 *
-	 * @return Response
+	 * @return View
 	 */
 	public function create()
 	{
@@ -296,7 +296,7 @@ class GigController extends AppBaseController
 		$finish = array_get($filter, 'fake_finish', explode(' ', $gigs->last()['start'])[0]);
 		$finish = Carbon::parse($finish);
 
-		$todaysGigs = $gigs->where('finish', '<', Carbon::tomorrow());
+		$todaysGigs = $gigs->where('start', '<=', Carbon::now())->where('finish', '<', Carbon::tomorrow());
 
 		$start = array_get($filter, 'fake_start');
 		$finish = array_get($filter, 'fake_finish', $finish);

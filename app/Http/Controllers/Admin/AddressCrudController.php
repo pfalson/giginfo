@@ -203,7 +203,7 @@ class AddressCrudController extends CrudController
 	}
 
 	/**
-	 * @param Request $request
+	 * @param \Request $request
 	 * @return PostalCode
 	 */
 	public static function getLocation($request)
