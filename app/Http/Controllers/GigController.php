@@ -70,7 +70,7 @@ class GigController extends AppBaseController
 	 *
 	 * @return View
 	 */
-	public function show($id, \Request $request)
+	public function show($id, Request $request)
 	{
 		$gig = $this->gigRepository->findWithoutFail($id);
 

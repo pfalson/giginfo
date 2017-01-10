@@ -1,7 +1,11 @@
 <!-- Artist Id Field -->
 <div class="form-group">
     {!! Form::label('artistName', 'Artist:') !!}
-    {!! $gig->artistName !!}
+    @if ($gig->artistWebsite)
+        <a href="{!! $gig->artistWebsite !!}">{!! $gig->artistName !!}</a>
+    @else
+        {!! $gig->artistName !!}
+    @endif
 </div>
 
 <!-- Venue Id Field -->
