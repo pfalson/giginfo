@@ -29,6 +29,6 @@ class EmailError extends Mailable
     {
         return $this->subject('Exception')
 	        ->view('emails.exception')
-	        ->with('content', $this->data);
+	        ->with($this->data);
     }
 }

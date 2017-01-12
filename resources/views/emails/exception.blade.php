@@ -26,9 +26,18 @@
 </head>
 <body>
 <div class="box">
-    <!-- /.login-logo -->
     <div class="error">
         {!! $content !!}
+    </div>
+    @if (isset($message))
+    <div class="error">
+        <h4><u>Message</u></h4>
+        {!! $message !!}
+    </div>
+    @endif
+    <div class="error">
+        <h4><u>Request</u></h4>
+        @include('include.arraydump', ['array' => $request])
     </div>
 </div>
 </body>
