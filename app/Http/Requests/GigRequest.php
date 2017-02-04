@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Venue;
 use App\Models\VenueType;
+use App\Repositories\AddressRepository;
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -81,9 +82,11 @@ class GigRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
 					$finish = $attributes['when'] . ' ' . $finish;
 				}
 
-				$starttime = Carbon::parse($start, $venue->timezone);
-				$finishtime = Carbon::parse($finish, $venue->timezone);
-				if ($finishtime->lt($starttime))
+				$tz = $venue !== null ? $venue->timezone : AddressRepository::retrieveTimeZone($attributes['longitude'], $attributes['latitude'])->timeZoneId;
+
+				$starttime = Carbon::parse($start, $tz);
+				$finishtime = Carbon::parse($finish, $tz);
+				while ($finishtime->lt($starttime))
 				{
 					$finishtime->addDay(1);
 				}
@@ -109,7 +112,7 @@ class GigRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
 
 				foreach (['name', 'facebook', 'phone'] as $attr)
 				{
-					$args[$attr] = array_get($attributes, $attr);
+					$args['venues.' . $attr] = array_get($attributes, $attr);
 				}
 
 				if ($venue !== null)
@@ -118,7 +121,7 @@ class GigRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
 				}
 				else
 				{
-					$venue = Venue::create($args);
+					$venue = Venue::firstOrCreate($args);
 				}
 
 				$modifiedAttributes['venue_id'] = $venue->id;

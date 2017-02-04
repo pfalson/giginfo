@@ -32,7 +32,8 @@
     "laravel/socialite": "^2.0",
     "hisorange/browser-detect": "^2.0",
     "ip2location/ip2location-php": "^8.0",
-    "sofa/eloquence": "^5.3"
+    "sofa/eloquence": "^5.3",
+    "jrean/laravel-user-verification": "^3.0"
   },
   "require-dev": {
     "fzaninotto/faker": "~1.4",

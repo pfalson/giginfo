@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode wherePostcodetypeId($value)
  * @mixin \Eloquent
  * @method static \Illuminate\Database\Query\Builder|\App\Models\PostalCode whereLongitude($value)
+ * @property-read \App\Models\City $city
  */
 class PostalCode extends Elegant
 {

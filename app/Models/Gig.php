@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Backpack\CRUD\CrudTrait;
+use DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -48,11 +49,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $image
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Gig whereImage($value)
  * @property-read mixed $timezone
+ * @property-read mixed $when
+ * @property-read mixed $starttime
+ * @property-read mixed $finishtime
  */
 class Gig extends GigBase
 {
 	use CrudTrait;
-
 	use SoftDeletes;
 
 	public function getStartAttribute()
@@ -78,5 +81,49 @@ class Gig extends GigBase
 	public function getFinishAttribute()
 	{
 		return $this->convertFromUTC('finish');
+	}
+
+	public function withFakes($columns = [])
+	{
+		/** @noinspection PhpUndefinedMethodInspection */
+		return Gig::where('gigs.id', $this->id)->details()->first();
+	}
+
+	/**
+	 * @param \Eloquent $builder
+	 * @return mixed
+	 */
+	public function scopeDetails($builder)
+	{
+		return $builder
+			->join('venues as v', 'v.id', 'venue_id')
+			->join('dropdowns as dd', 'dd.id', 'age')
+			->join('addresses as a', 'a.id', 'v.address_id')
+			->join('streets as s', 's.id', 'a.street_id')
+			->join('postalcodes as p', 'p.id', 'a.postalcode_id')
+			->join('cities as c', 'c.id', 'p.city_id')
+			->join('states as st', 'st.id', 'c.state_id')
+			->join('countries as co', 'co.id', 'st.country_id')
+			->join('timezones as t', 't.id', 'a.timezone_id')
+			->select([
+				'gigs.*',
+				'v.name as venueName',
+				'v.website as venueURI',
+				'v.venuetype_id as venuetype_id',
+				'a.id as address_id',
+				'a.street_number',
+				'a.longitude as longitude',
+				'a.latitude as latitude',
+				's.name as street',
+				'c.name as city',
+				'st.name as state',
+				'p.code as postal_code',
+				'co.name as country',
+				'co.sortname as countryCode',
+				'dd.value as ageValue',
+				't.name as timeZone',
+				DB::raw("@address:=CONCAT(@street:=CONCAT(a.street_number,' ',s.name,' ',c.name,', ',st.name),', ',co.name) as address"),
+				DB::raw("@house:=CONCAT(@street,', ',co.name) as house")
+			])->get();
 	}
 }

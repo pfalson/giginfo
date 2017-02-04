@@ -31,8 +31,6 @@ class VenueRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
 		/** @var ParameterBag $requestParams */
 		$requestParams = $this->request;
 
-		AddressRequest::buildAddress($requestParams);
-
 		/** @noinspection PhpUndefinedFieldInspection */
 		return array_map(
 			function ($v) use ($requestParams)

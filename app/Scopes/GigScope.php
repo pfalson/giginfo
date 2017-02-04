@@ -8,6 +8,7 @@ use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Database\Query\JoinClause;
 
 /**
  * Created by PhpStorm.
@@ -37,6 +38,7 @@ class GigScope implements Scope
 			$member = Member::where('user_id', $user->id)->first();
 			$builder = $builder->join('artist_members', function ($join) use ($member)
 			{
+				/** @var JoinClause $join */
 				$join->on('b.id', 'artist_members.artist_id')->where('member_id', $member->id);
 			});
 		}
@@ -56,7 +58,7 @@ class GigScope implements Scope
 				'b.name as artistName',
 				'b.website as artistWebsite',
 				'v.name as venueName',
-				'v.website as venueWebSite',
+				'v.website as venueURI',
 				'v.venuetype_id as venuetype_id',
 				'a.id as address_id',
 				'a.street_number',

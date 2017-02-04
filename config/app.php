@@ -185,6 +185,7 @@ return [
 		Backpack\LangFileManager\LangFileManagerServiceProvider::class,
 		hisorange\BrowserDetect\Provider\BrowserDetectService::class,
 		Laravel\Socialite\SocialiteServiceProvider::class,
+		Jrean\UserVerification\UserVerificationServiceProvider::class,
 //		Backpack\MenuCRUD\MenuCRUDServiceProvider::class,
 
 		/*
@@ -255,7 +256,8 @@ return [
 		'Feeds'            => willvincent\Feeds\Facades\FeedsFacade::class,
 		'Feed'             => Roumen\Feed\Feed::class,
 		'Gigs'             => App\Models\Facades\GigFacade::class,
-		'Gig'              => App\Models\Gig::class
+		'Gig'              => App\Models\Gig::class,
+		'UserVerification' => Jrean\UserVerification\Facades\UserVerification::class
 	],
 
 ];

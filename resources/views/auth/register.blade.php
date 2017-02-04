@@ -35,7 +35,8 @@
 </head>
 <body class="hold-transition register-page">
 <div class="register-box">
-    <div class="register-logo">
+    <div class="login-logo">
+        <img src="img/giginfo_logo.png" alt="GigInfo" style="height: 50px">
         <a href="{{ url('/home') }}"><b>Gig Info</b></a>
     </div>
 
@@ -91,13 +92,13 @@
             </div>
 
             <div class="row">
-                <div class="col-xs-8">
-                    <div class="checkbox icheck">
-                        <label>
-                            <input type="checkbox"> I agree to the <a href="#">terms</a>
-                        </label>
-                    </div>
-                </div>
+                {{--<div class="col-xs-8">--}}
+                    {{--<div class="checkbox icheck">--}}
+                        {{--<label>--}}
+                            {{--<input type="checkbox"> I agree to the <a href="#">terms</a>--}}
+                        {{--</label>--}}
+                    {{--</div>--}}
+                {{--</div>--}}
                 <!-- /.col -->
                 <div class="col-xs-4">
                     <button type="submit" class="btn btn-primary btn-block btn-flat">Register</button>
@@ -107,6 +108,14 @@
         </form>
 
         <a href="{{ url('/login') }}" class="text-center">I already have a membership</a>
+        <div style="margin-top: 10px">
+            <a href="{{ route('social.login', ['facebook']) }}">
+                <img border="0" alt="Facebook" src="img/facebook.png">
+            </a>
+            <a href="{{ route('social.login', ['google']) }}">
+                <img border="0" alt="Google" src="img/google.png">
+            </a>
+        </div>
     </div>
     <!-- /.form-box -->
 </div>

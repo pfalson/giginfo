@@ -27,6 +27,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistTemplate whereTemplateTypeId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistTemplate whereDeletedAt($value)
  * @mixin \Eloquent
+ * @property string $name
+ * @property string $source
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistTemplate whereName($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistTemplate whereSource($value)
  */
 class ArtistTemplate extends Elegant
 {

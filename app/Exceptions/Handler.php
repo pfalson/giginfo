@@ -2,13 +2,16 @@
 
 namespace App\Exceptions;
 
+use App;
 use App\Mail\EmailError;
+use Auth;
 use Config;
 use DOMDocument;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Session\TokenMismatchException;
+use Jrean\UserVerification\Exceptions\UserNotVerifiedException;
 use Log;
 use Mail;
 
@@ -44,7 +47,11 @@ class Handler extends ExceptionHandler
 		// Don't report VerifyCSRFToken mismatch if the cookies were removed
 		if ($this->notMissingToken($e))
 		{
-			if ($e instanceof \Exception)
+			if ($e instanceof AuthenticationException)
+			{
+			}
+			else /** @noinspection PhpMethodParametersCountMismatchInspection */
+				if ($e instanceof \Exception && !App::runningInConsole() && !App::environment('local'))
 			{
 				$debugSetting = Config::get('app.debug');
 
@@ -66,7 +73,8 @@ class Handler extends ExceptionHandler
 					$mock = new DOMDocument;
 					$d->loadHTML($content->original);
 					$body = $d->getElementsByTagName('body')->item(0);
-					foreach ($body->childNodes as $child){
+					foreach ($body->childNodes as $child)
+					{
 						$mock->appendChild($mock->importNode($child, true));
 					}
 					$data['content'] = $mock->saveHTML();
@@ -89,6 +97,12 @@ class Handler extends ExceptionHandler
 					$data['request']['Input'] = $input;
 				}
 
+				$user = Auth::user();
+				if ($user !== null)
+				{
+					$data['request']['User'] = $user;
+				}
+
 				Mail::to('contact@giginfo.org')
 					->send(new EmailError($data));
 			}
@@ -106,6 +120,11 @@ class Handler extends ExceptionHandler
 	 */
 	public function render($request, Exception $exception)
 	{
+		if ($exception instanceof UserNotVerifiedException)
+		{
+			return redirect('/email-verification/error');
+		}
+
 		return parent::render($request, $exception);
 	}
 

@@ -66,7 +66,7 @@
                     if ($existingVal.indexOf(':') === -1) {
                         $existingVal += ' 00:00:00';
                     }
-                    preparedDate = new Date($existingVal).format($customConfig.format);
+                    preparedDate = new Date($existingVal.replace(/-/g, "/")).format($customConfig.format);
                     $fake.val(preparedDate);
                     $picker.datepicker('update', preparedDate);
                 }

@@ -10,9 +10,21 @@
 
 <!-- Venue Id Field -->
 <div class="form-group">
-    {!! Form::label('venueName', 'Venue:') !!}
-    <a href="{!! $gig->venueWebSite !!}">{!! $gig->venueName !!}</a>
+    @if (!empty($gig->venueName))
+        {!! Form::label('venueName', 'Venue:') !!}
+        <a href="{!! $gig->venueURI !!}">{!! $gig->venueName !!}</a>
+    @else
+        {!! Form::label('address', 'Address:') !!}
+        {!! $gig->address !!}
+    @endif
 </div>
+
+@if (!empty($gig->ticketurl))
+    <div class="form-group">
+        {!! Form::label('ticketurl', 'Tickets:') !!}
+        <a href="{!! $gig->ticketurl !!}"></a>
+    </div>
+@endif
 
 <!-- Start Field -->
 <div class="form-group">

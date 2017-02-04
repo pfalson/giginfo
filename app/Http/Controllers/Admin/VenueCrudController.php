@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\AddressRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 
 // VALIDATION: change the requests to match your own file names if you need form validation
@@ -18,8 +19,16 @@ class VenueCrudController extends CrudController
 
 	public function setUp()
 	{
+		/** @var \Request $request */
+		$request = $this->request;
+
+		if ($request->getMethod() === 'POST')
+		{
+			AddressRequest::buildAddress($request);
+		}
+
 		$previous = URL::previous();
-		$postalcode = AddressCrudController::getLocation($this->request);
+		$postalcode = AddressCrudController::getLocation($request);
 
 		/*
 		|--------------------------------------------------------------------------

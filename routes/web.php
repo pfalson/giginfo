@@ -40,18 +40,19 @@ Route::get('getCityFromPosition', array('as' => 'getCityFromPosition', function 
 
 Route::get('iframeGigs', 'IFrameController@gigs');
 
-Route::get('gigs/test', function()
+Route::get('gigs/test', function ()
 {
 	return view('gigs.test')->with(['latitude' => 0, 'longitude' => 0]);
 });
 
-Route::get("gigs/ical", function() {
+Route::get("gigs/ical", function ()
+{
 	ob_start();
 	require(public_path("ical.php"));
 	return ob_get_clean();
 });
 
-Route::get('events', function()
+Route::get('events', function ()
 {
 	return view('events');
 });
@@ -60,6 +61,11 @@ Route::get('/', function ()
 {
 	return view('welcome');
 });
+
+Route::get('register/verify/{confirmationCode}', [
+	'as'   => 'confirmation_path',
+	'uses' => 'Auth\RegisterController@confirm'
+]);
 
 Route::get('feed/gigs', function (Request $request)
 {
@@ -109,69 +115,29 @@ Route::get('feed/gigs', function (Request $request)
 
 });
 
-//Route::get('feed/{format}', function ($format)
-//{
-//	$posts = [
-//		"0" => [
-//			'title' => 'Post 1',
-//			'link' => 'http://package.dev/post/1',
-//			'description' => 'Post 1 description',
-//			'author' => ['email' => 'zoxray@gmail.com', 'name' => 'Viktor Pavlov', 'url' => url('/')],
-//			'image' => 'http://pavlov.od.ua/images/posts/post-e7d628ade3e3bb1caad4d1c5f95b2090.jpg',
-//			'pubdate' => date('D, d M Y H:i:s O')
-//		],
-//		"1" => [
-//			'title' => 'Post 2',
-//			'link' => 'http://package.dev/post/2',
-//			'description' => 'Post 2 description',
-//			'author' => ['email' => 'zoxray@gmail.com', 'name' => 'Viktor Pavlov', 'url' => url('/')],
-//			'image' => 'http://pavlov.od.ua/images/posts/post-e7d628ade3e3bb1caad4d1c5f95b2090.jpg',
-//			'pubdate' => date('D, d M Y H:i:s O', strtotime("-30 days"))
-//		],
-//	];
-//	$feed = App::make('feed');
-//	$feed->setChannel([
-//		'title' => 'News',
-//		'lang' => $feed->getLang(),
-//		'description' => 'Laravel',
-//		'link' => $feed->getURL(),
-//		'logo' => 'http://package.dev/logo.png',
-//		'icon' => 'http://package.dev/favicon.ico',
-//		'pubdate' => $feed->getPubdate()
-//	]);
-//	foreach ($posts as $post)
-//	{
-//		$feed->addItem([
-//			'title' => $post['title'],
-//			'link' => $post['link'],
-//			'description' => $post['description'],
-//			'author' => $post['author'],
-//			'enclosure' => $post['image'],
-//			'pubdate' => $post['pubdate'],
-//		]);
-//	}
-//	return $feed->render($format);
-//});
-
-Route::resource('genre', 'GenreController');
-Route::resource('templatetype', 'TemplateTypeController');
-Route::resource('artist', 'ArtistController');
-Route::resource('venue', 'VenueController');
-Route::resource('member', 'MemberController');
-Route::resource('address', 'AddressController');
-Route::resource('country', 'CountryController');
-//Route::resource('state', 'StateController');
-Route::resource('city', 'CityController');
-Route::resource('postallocation', 'PostalLocationController');
-Route::resource('postalcode', 'PostalCodeController');
-Route::resource('locationtype', 'LocationTypeController');
-Route::resource('artistgenre', 'ArtistGenreController');
-Route::resource('artistmember', 'ArtistMemberController');
-Route::resource('instrument', 'InstrumentController');
-Route::resource('memberinstrument', 'MemberInstrumentController');
-Route::resource('dropdowns', 'DropDownsController');
-Route::resource('postcodetype', 'PostCodeTypeController');
-
+Route::group(['middleware' => ['sysadm']], function ()
+{
+	Route::resource('genre', 'GenreController');
+	Route::resource('templatetype', 'TemplateTypeController');
+	Route::resource('artist', 'ArtistController');
+	Route::resource('venue', 'VenueController');
+	Route::resource('member', 'MemberController');
+	Route::resource('address', 'AddressController');
+	Route::resource('country', 'CountryController');
+	Route::resource('city', 'CityController');
+	Route::resource('postallocation', 'PostalLocationController');
+	Route::resource('postalcode', 'PostalCodeController');
+	Route::resource('locationtype', 'LocationTypeController');
+	Route::resource('artistgenre', 'ArtistGenreController');
+	Route::resource('artistmember', 'ArtistMemberController');
+	Route::resource('instrument', 'InstrumentController');
+	Route::resource('memberinstrument', 'MemberInstrumentController');
+	Route::resource('dropdowns', 'DropDownsController');
+	Route::resource('postcodetype', 'PostCodeTypeController');
+	Route::resource('venues', 'VenueController');
+	Route::resource('streets', 'StreetController');
+	Route::resource('addresses', 'AddressController');
+});
 //Route::get('/', function ()
 //{
 //	return View::make('hello');
@@ -182,7 +148,7 @@ Route::resource('crudartists', 'Crud\ArtistController');
 //Route::group(['namespace' => 'Pages'], function ()
 //{
 Route::get('location/{query}', [
-	'as' => 'location_path',
+	'as'   => 'location_path',
 	'uses' => 'JsonController@getLocation'
 ]);
 //});
@@ -195,27 +161,21 @@ Auth::routes();
 
 Route::get('/home', ['as' => 'home', 'uses' => 'HomeController@index']);
 
-Route::resource('venues', 'VenueController');
+//Route::get('generator_builder', '\InfyOm\GeneratorBuilder\Controllers\GeneratorBuilderController@builder');
+//
+//Route::get('field_template', '\InfyOm\GeneratorBuilder\Controllers\GeneratorBuilderController@fieldTemplate');
 
-Route::resource('streets', 'StreetController');
+//Route::post('generator_builder/generate', '\InfyOm\GeneratorBuilder\Controllers\GeneratorBuilderController@generate');
 
-Route::resource('addresses', 'AddressController');
+//Route::get('search', function ()
+//{
+//	return view('search');
+//});
 
-Route::get('generator_builder', '\InfyOm\GeneratorBuilder\Controllers\GeneratorBuilderController@builder');
-
-Route::get('field_template', '\InfyOm\GeneratorBuilder\Controllers\GeneratorBuilderController@fieldTemplate');
-
-Route::post('generator_builder/generate', '\InfyOm\GeneratorBuilder\Controllers\GeneratorBuilderController@generate');
-
-Route::get('search', function ()
-{
-	return view('search');
-});
-
-Route::get('autocomplete', function ()
-{
-	return view('autocomplete');
-});
+//Route::get('autocomplete', function ()
+//{
+//	return view('autocomplete');
+//});
 
 Route::get('find/{table?}', 'SearchController@find');
 
@@ -223,18 +183,24 @@ Route::resource('gigs', 'GigController');
 
 Route::get('gigs/{id}/poster', 'GigController@poster');
 Route::get('manage-gigs', 'Crud\GigController@manageCrud');
-Route::resource('crudgigs','Crud\GigController');
+Route::resource('crudgigs', 'Crud\GigController');
 
-Route::group(['middleware'=>'auth'], function()
+Route::group(['middleware' => ['web', 'isVerified']], function ()
 {
-	Route::group(['prefix' => 'admin'], function ()
+	Route::group(['middleware' => 'auth'], function ()
 	{
-		CRUD::resource('gig', 'Admin\GigCrudController');
-		CRUD::resource('venue', 'Admin\VenueCrudController');
-		CRUD::resource('artist', 'Admin\ArtistCrudController');
-		CRUD::resource('genre', 'Admin\GenreCrudController');
-		CRUD::resource('artist_template_type', 'Admin\ArtistTemplateTypeCrudController');
-		CRUD::resource('artist_template', 'Admin\ArtistTemplateCrudController');
+		Route::get('user/edit', 'UserController@edit');
+		Route::match(['put', 'patch'], 'user/{user}', ['as' => 'user.update', 'uses' => 'UserController@update']);
+
+		Route::group(['prefix' => 'admin'], function ()
+		{
+			CRUD::resource('gig', 'Admin\GigCrudController');
+			CRUD::resource('venue', 'Admin\VenueCrudController');
+			CRUD::resource('artist', 'Admin\ArtistCrudController');
+			CRUD::resource('genre', 'Admin\GenreCrudController');
+			CRUD::resource('artist_template_type', 'Admin\ArtistTemplateTypeCrudController');
+			CRUD::resource('artist_template', 'Admin\ArtistTemplateCrudController');
+		});
 	});
 });
 

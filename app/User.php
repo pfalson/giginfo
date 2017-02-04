@@ -2,10 +2,14 @@
 
 namespace App;
 
+use App\Models\Member;
+use Auth;
+use Backpack\Base\app\Notifications\ResetPasswordNotification;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Jrean\UserVerification\Traits\VerifiesUsers;
+use Jrean\UserVerification\Traits\UserVerification;
 use Nicolaslopezj\Searchable\SearchableTrait;
-use Symfony\Component\HttpKernel\Profiler\Profile;
 
 /**
  * App\User
@@ -30,11 +34,21 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
  * @method static \Illuminate\Database\Query\Builder|\App\User search($search, $threshold = null, $entireText = false, $entireTextOnly = false)
  * @method static \Illuminate\Database\Query\Builder|\App\User searchRestricted($search, $restriction, $threshold = null, $entireText = false, $entireTextOnly = false)
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $readNotifications
+ * @property boolean $confirmed
+ * @property string $confirmation_code
+ * @method static \Illuminate\Database\Query\Builder|\App\User whereConfirmed($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\User whereConfirmationCode($value)
+ * @property bool $verified
+ * @property string $verification_token
+ * @method static \Illuminate\Database\Query\Builder|\App\User whereVerified($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\User whereVerificationToken($value)
  */
 class User extends Authenticatable
 {
     use Notifiable;
 	use SearchableTrait;
+	use VerifiesUsers;
+	use UserVerification;
 
 	/**
      * The attributes that are mass assignable.
@@ -42,7 +56,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'verified'
     ];
 
     /**
@@ -59,4 +73,41 @@ class User extends Authenticatable
 			'name' => 10
 		]
 	];
+
+	/**
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+	 **/
+	public function member()
+	{
+		return $this->hasOne(Member::class);
+	}
+
+	/**
+	 * @param \Eloquent $builder
+	 */
+	public function scopeDetails($builder)
+	{
+		$user = Auth::user();
+		if ($user !== null)
+		{
+			$builder->select()
+				->join('members as m', 'm.user_id', 'users.id')
+				->select([
+					'users.*',
+					'm.primary_role as primary_role',
+					'm.biography as biography'
+				]);
+		}
+	}
+
+	/**
+	 * Send the password reset notification.
+	 *
+	 * @param  string  $token
+	 * @return void
+	 */
+	public function sendPasswordResetNotification($token)
+	{
+		$this->notify(new ResetPasswordNotification($token));
+	}
 }

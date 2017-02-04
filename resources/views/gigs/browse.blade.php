@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.gigs')
 
 @section('content')
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
@@ -203,7 +203,7 @@
         </div>
         <p></p>
         <div id="div_showDistance" style="display: {{ $showFilterHidden == 'none' ? 'block' : 'none' }}">
-            Within {{ $distance }} km
+            {{ $today ? "Today's gigs w" : "W" }}ithin {{ $distance }} km
         </div>
         <div class="box box-primary">
             <div class="box-body">
@@ -216,6 +216,7 @@
         </div>
     </div>
     <div id="currentLocation">
+        &nbsp;<!-- keep to get IE to render this div -->
     </div>
 @endsection
 @section('scripts')

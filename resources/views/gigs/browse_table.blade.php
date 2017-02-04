@@ -67,7 +67,7 @@
                 @endif
             </td>
             <td>{!! $gig->artistName !!}</td>
-            <td>{!! $gig->venueName !!}</td>
+            <td>{!! empty($gig->venueName) ? $gig->cityName : $gig->venueName !!}</td>
             <td>{!! date('d M Y', strtotime($gig->start)) !!}</td>
             <td>{!! date('h:ia', strtotime($gig->start)) !!}</td>
             <td>{!! date('h:ia', strtotime($gig->finish)) !!}</td>

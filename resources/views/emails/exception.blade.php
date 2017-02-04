@@ -32,7 +32,11 @@
     @if (isset($message))
     <div class="error">
         <h4><u>Message</u></h4>
-        {!! $message !!}
+        @if (is_array($message))
+            @include('include.arraydump', ['array' => $message])
+        @elseif (is_string($message))
+            {!! $message !!}
+        @endif
     </div>
     @endif
     <div class="error">

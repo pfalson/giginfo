@@ -2,90 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Admin\AddressCrudController;
-use App\Http\Requests\CreateGigRequest;
-use App\Http\Requests\UpdateGigRequest;
 use App\Models\Artist;
 use App\Models\ArtistMember;
 use App\Models\Gig;
+use App\Models\Member;
 use App\Models\VenueType;
 use App\Repositories\GigRepository;
+use App\User;
+use Auth;
 use Carbon\Carbon;
 use DB;
 use File;
 use Illuminate\Http\Request;
 use Flash;
-use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Input;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
 use Session;
 use View;
 
-class GigController extends AppBaseController
+class UserController extends AppBaseController
 {
-	/** @var  GigRepository */
-	private $gigRepository;
-
-	public function __construct(GigRepository $gigRepo)
+	public function __construct()
 	{
-		$this->gigRepository = $gigRepo;
 	}
 
-	/**
-	 * Display a listing of the Gig.
-	 *
-	 * @param Request $request
-	 * @return Response
-	 */
-	public function index(Request $request)
+	public function show()
 	{
-		return $this->applyFilter($request);
-	}
-
-	/**
-	 * Show the form for creating a new Gig.
-	 *
-	 * @return View
-	 */
-	public function create()
-	{
-		return view('gigs.create');
-	}
-
-	/**
-	 * Store a newly created Gig in storage.
-	 *
-	 * @param CreateGigRequest $request
-	 *
-	 * @return View
-	 */
-	public function store(CreateGigRequest $request)
-	{
-		return $this->applyFilter($request);
-	}
-
-	/**
-	 * Display the specified Gig.
-	 *
-	 * @param  int $id
-	 *
-	 * @return View
-	 */
-	public function show($id, \Request $request)
-	{
-		$gig = $this->gigRepository->findWithoutFail($id);
-
-		if (empty($gig))
-		{
-			Flash::error('Gig not found');
-
-			return redirect(route('gigs.index'));
-		}
-
-		$current = AddressCrudController::getLocation($request);
-
-		/** @noinspection PhpUndefinedMethodInspection */
-		return view('gigs.show')->with(compact('gig', 'current'));
 	}
 
 	/**
@@ -95,54 +38,35 @@ class GigController extends AppBaseController
 	 *
 	 * @return Response
 	 */
-	public function edit($id)
+	public function edit()
 	{
-		$gig = $this->gigRepository->findWithoutFail($id);
-
-		if (empty($gig))
-		{
-			Flash::error('Gig not found');
-
-			return redirect(route('gigs.index'));
-		}
+		/** @noinspection PhpUndefinedMethodInspection */
+		$user = User::where('users.id', Auth::user()->id)->details()->firstOrFail();
 
 		/** @noinspection PhpUndefinedMethodInspection */
-		return view('gigs.edit')->with('gig', $gig);
+		return view('user.edit')->with(compact('user'));
 	}
 
 	/**
 	 * Update the specified Gig in storage.
 	 *
 	 * @param  int $id
-	 * @param UpdateGigRequest $request
 	 *
 	 * @return Response
 	 */
-	public function update($id, UpdateGigRequest $request)
+	public function update($id)
 	{
-		$gig = $this->gigRepository->findWithoutFail($id);
+		DB::beginTransaction();
 
-		if (empty($gig))
-		{
-			Flash::error('Gig not found');
+		User::where('id', $id)->update(['name' => Input::get('name')]);
+		Member::where('user_id', $id)->update(['biography' => Input::get('biography')]);
 
-			return redirect(route('gigs.index'));
-		}
+		DB::commit();
 
-		$file = $request->file('poster');
 		/** @noinspection PhpUndefinedMethodInspection */
-		$img = Image::make($file);
-		/** @noinspection PhpUndefinedMethodInspection */
-		Response::make($img->encode('jpeg'));
-		$attributes = $request->all();
-		/** @noinspection PhpUndefinedMethodInspection */
-		$attributes['poster'] = $img->getEncoded();
+		\Alert::success('User updated successfully.')->flash();
 
-		$this->gigRepository->update($attributes, $id);
-
-		Flash::success('Gig updated successfully.');
-
-		return redirect(route('gigs.index'));
+		return redirect(route('home'));
 	}
 
 	/**
@@ -154,6 +78,7 @@ class GigController extends AppBaseController
 	 */
 	public function destroy($id)
 	{
+		/** @noinspection PhpUndefinedFieldInspection */
 		$gig = $this->gigRepository->findWithoutFail($id);
 
 		if (empty($gig))
@@ -163,6 +88,7 @@ class GigController extends AppBaseController
 			return redirect(route('gigs.index'));
 		}
 
+		/** @noinspection PhpUndefinedFieldInspection */
 		$this->gigRepository->delete($id);
 
 		Flash::success('Gig deleted successfully.');
@@ -172,6 +98,7 @@ class GigController extends AppBaseController
 
 	public function poster($id)
 	{
+		/** @noinspection PhpUndefinedFieldInspection */
 		$gig = $this->gigRepository->findWithoutFail($id);
 
 		if (empty($gig))
@@ -198,6 +125,7 @@ class GigController extends AppBaseController
 
 	public function ical($id)
 	{
+		/** @noinspection PhpUndefinedFieldInspection */
 		$gig = $this->gigRepository->findWithoutFail($id);
 
 		if (empty($gig))
@@ -253,10 +181,12 @@ class GigController extends AppBaseController
 				$finish = Carbon::parse($finish);
 		}
 
+		/** @noinspection PhpUndefinedFieldInspection */
 		$this->gigRepository->pushCriteria(new RequestCriteria($request));
 
 //		$artists = Artist::details()->pluck('name', 'id')->toArray();
 
+		/** @noinspection PhpUndefinedFieldInspection */
 		/** @var Gig $gigs */
 		$gigs = $this->gigRepository->orderBy('start')->all()
 			->where('start', '>=', $start);
@@ -307,9 +237,7 @@ SELECT id FROM (SELECT id, ( 6371 * acos( cos( radians("
 		$finish = array_get($filter, 'fake_finish', explode(' ', $gigs->last()['start'])[0]);
 		$finish = Carbon::parse($finish);
 
-		$now = Carbon::now();
-		$tomorrow = Carbon::tomorrow();
-		$todaysGigs = Gig::where('start', '>=', $now)->where('start', '<', $tomorrow)->get();
+		$todaysGigs = $gigs->where('start', '<=', Carbon::now())->where('start', '<', Carbon::tomorrow());
 
 		$start = array_get($filter, 'fake_start');
 		$finish = array_get($filter, 'fake_finish', $finish);

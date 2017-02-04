@@ -56,7 +56,7 @@ class AddressRequest extends \Backpack\CRUD\app\Http\Requests\CrudRequest
     }
 
 	/**
-	 * @param ParameterBag $requestParams
+	 * @param \Request $requestParams
 	 */
 	public static function buildAddress($requestParams)
 	{

@@ -52,26 +52,27 @@ $field_language = isset($field['duration_picker_options']['language']) ? $field[
     <script>
         jQuery(document).ready(function ($) {
             $('[data-bs-durationpicker]').each(function () {
-                var $fake = $(this),
-                        $field = $fake.parents('.form-group').find('input[type="hidden"]'),
-                        $customConfig = $.extend({
-//                            default: $field.val()
-                            showDuration: true
-                        }, $fake.data('bs-durationpicker'));
+                try {
+                    var $fake = $(this),
+                            $field = $fake.parents('.form-group').find('input[type="hidden"]'),
+                            $customConfig = $.extend({
+    //                            default: $field.val()
+                                showDuration: true
+                            }, $fake.data('bs-durationpicker'));
 
-                $customConfig.locale = $customConfig['language'];
-                delete($customConfig['language']);
-                var start = $('#start_' + $field[0].name).val();
-                if (typeof start !== 'undefined' && start.indexOf(' ') !== -1) {
-                    start = start.split(" ")[1];
-                } else {
-                    start = null;
-                }
-                $picker = $fake.timepicker({
-                    'minTime': start,
-                    'showDuration': true
-                });
-                $fake.timepicker('setTime', new Date($field.val()));
+                    $customConfig.locale = $customConfig['language'];
+                    delete($customConfig['language']);
+                    var start = $('#start_' + $field[0].name).val();
+                    if (typeof start !== 'undefined' && start.indexOf(' ') !== -1) {
+                        start = start.split(" ")[1];
+                    } else {
+                        start = null;
+                    }
+                    $picker = $fake.timepicker({
+                        'minTime': start,
+                        'showDuration': true
+                    });
+                    $fake.timepicker('setTime', new Date($field.val().replace(/-/g, "/")));
 //                $(this).durationPicker({
 //                    hours: {
 //                        label: 'hours',
@@ -86,14 +87,17 @@ $field_language = isset($field['duration_picker_options']['language']) ? $field[
 ////                    classname: "myclass"
 //                });
 
-                $fake.on('keydown', function (e) {
-                    e.preventDefault();
-                    return false;
-                });
+                    $fake.on('keydown', function (e) {
+                        e.preventDefault();
+                        return false;
+                    });
 
-                $picker.on('change', function (e) {
-                    $field.val($fake.val()).trigger('change');
-                });
+                    $picker.on('change', function (e) {
+                        $field.val($fake.val()).trigger('change');
+                    });
+                } catch (e) {
+                    alert(e);
+                }
             });
         });
     </script>

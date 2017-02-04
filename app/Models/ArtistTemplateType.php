@@ -27,6 +27,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistTemplateType whereTemplateTypeId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\ArtistTemplateType whereDeletedAt($value)
  * @mixin \Eloquent
+ * @property integer $artist_template_id
+ * @property-read \App\Models\DropDowns $type
+ * @property-read \App\Models\ArtistTemplate $artistTemmplate
  */
 class ArtistTemplateType extends Elegant
 {
@@ -76,6 +79,7 @@ class ArtistTemplateType extends Elegant
 	 **/
 	public function type()
 	{
+		/** @noinspection PhpUndefinedMethodInspection */
 		return $this->belongsTo(DropDowns::class, 'templatetype', 'id')->where('name', 'templatetype');
 	}
 

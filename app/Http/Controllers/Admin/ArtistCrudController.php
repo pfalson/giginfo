@@ -169,7 +169,7 @@ class ArtistCrudController extends CrudController
         latitude.change(function () {
             if (latitude.val() !== '') {
                 currentLocation = $('#currentLocation');
-                if (currentLocation.val().startsWith('Unable')) {
+                if (currentLocation.val().indexOf('Unable') === 0) {
                     alert(currentLocation.val());
                 }
                 $('#form').submit();

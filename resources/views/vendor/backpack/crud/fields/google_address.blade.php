@@ -1,11 +1,12 @@
 <?php
-$entity_model = $crud->getModel();
-
-//for update form, get initial state of the entity
-if (isset($id) && $id)
-{
-    $entity_column = $entity_model::find($id)->getAttributes();
-}
+//$entity_model = $crud->getModel();
+////for update form, get initial state of the entity
+//if (isset($id) && $id)
+//{
+//    dd($field);
+//    dd('here');
+//    $entity_column = $entity_model::find($id)->getAttributes();
+//}
 
 $googleApiKey = isset($field['google_api_key']) ? $field['google_api_key'] : (config('backpack.google_api_key', env('GOOGLE_API_KEY', null)));
 
@@ -22,7 +23,7 @@ $notification->message = trans('backpack::crud.address_google_error_message');
             type="text"
             name="{{ $field['name'] }}"
             id="{{ $field['name'] }}"
-            value="{{ old($field['name'], isset($entity_column[$field['name']]) ? $entity_column[$field['name']] : '') }}"
+            value="{{ old($field['name']) ? old($field['name']) : (isset($field['value']) ? $field['value'] : (isset($field['default']) ? $field['default'] : '' )) }}"
             @include('crud::inc.field_attributes')
     >
     <div id="map" style="height: 300px"></div>
@@ -47,7 +48,7 @@ $notification->message = trans('backpack::crud.address_google_error_message');
                     type="{{ $attribute['field_type'] }}"
                     name="{{ $name }}"
                     id="{{ $name }}"
-                    value="{{ old($name, isset($entity_column[$name]) ? $entity_column[$name] : null) }}"
+                    value="{{ trim(old($name, isset($entry[$name]) ? $entry[$name] : null)) }}"
                     @include('crud::inc.field_attributes')
             >
             @if ($attribute['field_type'] !== 'hidden')
@@ -73,11 +74,8 @@ $notification->message = trans('backpack::crud.address_google_error_message');
     @push('crud_fields_scripts')
     <script src="/js/getTimeZone.js"></script>
     <script>
-
-        var field =
-                {!! json_encode($field) !!}
-        var notification =
-                {!! json_encode($notification) !!}
+        var field = {!! json_encode($field) !!}
+        var notification = {!! json_encode($notification) !!}
 
         map = null;
         var input = null;
@@ -108,11 +106,11 @@ $notification->message = trans('backpack::crud.address_google_error_message');
         function initAutocomplete() {
             if (document.getElementById(field.name)) {
 
-                var lat = {{ old('latitude', isset($entity_column['latitude']) ? $entity_column['latitude'] : $field['lat']) }};
-                var lng = {{ old('longitude', isset($entity_column['longitude']) ? $entity_column['longitude'] : $field['long']) }};
+                var lat = {{ old('latitude', isset($entry['latitude']) ? $entry['latitude'] : $field['lat']) }};
+                var lng = {{ old('longitude', isset($entry['longitude']) ? $entry['longitude'] : $field['long']) }};
                 map = new google.maps.Map(document.getElementById('map'), {
                     center: {lat: lat, lng: lng},
-                    zoom: {{ old('latitude', isset($entity_column['latitude']) ? 18 : 13) }}
+                    zoom: {{ old('latitude', isset($entry['latitude']) ? 18 : 13) }}
                 });
 
                 var marker = new google.maps.Marker({
